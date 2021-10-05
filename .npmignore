@@ -1,0 +1,11 @@
+.*
+src
+test
+node_modules
+coverage
+example
+test
+!dist/*
+*.gif
+**/webpack.config.js
+**/webpack.config.test.js
