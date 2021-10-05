@@ -1,0 +1,32 @@
+{
+  "name": "@excaliburjs/plugin-aseprite",
+  "version": "0.25.0",
+  "description": "Aseprite Resource Plugin for Excalibur",
+  "main": "./dist/excalibur-aseprite.js",
+  "typings": "./dist/src/index.d.ts",
+  "scripts": {
+    "start": "webpack-dev-server --config webpack.config.test.js --open",
+    "watch": "webpack --progress --watch",
+    "build": "webpack --mode production"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/excaliburjs/excalibur-aseprite.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/excaliburjs/excalibur-aseprite/issues"
+  },
+  "homepage": "https://github.com/excaliburjs/excalibur-aseprite#readme",
+  "devDependencies": {
+    "acorn": "8.5.0",
+    "excalibur": "0.25.0",
+    "raw-loader": "4.0.2",
+    "ts-loader": "9.2.6",
+    "typescript": "4.4.3",
+    "webpack": "5.56.1",
+    "webpack-cli": "4.8.0",
+    "webpack-dev-server": "4.3.1"
+  }
+}
