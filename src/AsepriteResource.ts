@@ -7,7 +7,7 @@ export class AsepriteResource implements Loadable<AsepriteSpriteSheet> {
     private _resource: Resource<AsepriteRaw>;
     public data!: AsepriteSpriteSheet;
     public rawAseprite!: AsepriteRaw;
-    public asepriteImage!: ImageSource;
+    public image!: ImageSource;
 
     public convertPath: (originPath: string, relativePath: string) => string;
     constructor(path: string, public bustCache = false) {
@@ -36,7 +36,7 @@ export class AsepriteResource implements Loadable<AsepriteSpriteSheet> {
         const spriteSheetImage = new ImageSource(imagepath, this.bustCache);
         await spriteSheetImage.load();
         this.rawAseprite = asepriteData;
-        this.asepriteImage = spriteSheetImage;
+        this.image = spriteSheetImage;
         return this.data = new AsepriteSpriteSheet(asepriteData, spriteSheetImage);
     }
 

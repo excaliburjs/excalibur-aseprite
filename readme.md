@@ -1,44 +1,44 @@
 
-https://www.aseprite.org/docs/cli/#format
+# Aseprite Plugin For Excalibur
 
-`seprite -b sprite.ase --format json-array --data spritesheet.json --sheet spritesheet.png`
+This extension adds support for [Aseprite](https://www.aseprite.org/) SpriteSheets and Animations exported to json.
+
+```
+> npm install @excaliburjs/plugin-aseprite
+```
+
+1. Export using the [aseprite cli](https://www.aseprite.org/docs/cli/) or through the UI 
+
+![Export as JSON in Aseprite](./export.gif)
+
+2. Load the Aseprite resource via the json and voila ✨
+  - Use `AsepriteResource.getAnimation(name)` to retrieve animations by the name in aseprite
+  - Use `AsepriteResource.getSpriteSheet()` to get the equivalent Excalibur SpriteSheet
+  - Use `Aseprite.rawAseprite` to access the raw data structure from Aseprite
+  - Use `Aseprite.image` to access the source image for the SpriteSheet
+
+## Example:
 
 ```typescript
-{ "frames": [
-   {
-    "filename": "sprite 0.ase",
-    "frame": { "x": 0, "y": 0, "w": 256, "h": 256 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 256, "h": 256 },
-    "sourceSize": { "w": 256, "h": 256 },
-    "duration": 100
-   },
-   {
-    "filename": "sprite 1.ase",
-    "frame": { "x": 256, "y": 0, "w": 256, "h": 256 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 256, "h": 256 },
-    "sourceSize": { "w": 256, "h": 256 },
-    "duration": 200
-   },
-   {
-    "filename": "sprite 2.ase",
-    "frame": { "x": 512, "y": 0, "w": 256, "h": 256 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 256, "h": 256 },
-    "sourceSize": { "w": 256, "h": 256 },
-    "duration": 100
-   }
- ],
- "meta": {
-  "app": "http://www.aseprite.org/",
-  "version": "1.2-dev",
-  "format": "RGBA8888",
-  "size": { "w": 768, "h": 256 },
-  "scale": "1"
- }
-}
+import { AsepriteResource } from "@excaliburjs/plugin-aseprite";
+
+const game = new Engine({
+    width: 600,
+    height: 400,
+    displayMode: DisplayMode.FitScreen
+});
+
+const asepriteSpriteSheet = new AsepriteResource('./beetle.json');
+
+const loader = new Loader([asepriteSpriteSheet]);
+game.start(loader).then(() => {
+
+    const anim = asepriteSpriteSheet.getAnimation('Loop');
+    const actor = new Actor({pos: vec(100, 100)});
+    actor.graphics.use(anim);
+    
+    game.currentScene.add(actor);
+});
 ```
+
+![Example running](./example.gif)
