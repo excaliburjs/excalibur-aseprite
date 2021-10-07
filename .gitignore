@@ -1,2 +1,5 @@
 node_modules
 dist/
+example/*.js
+example/*.js.map
+actual*.png

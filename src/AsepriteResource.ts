@@ -28,8 +28,6 @@ export class AsepriteResource implements Loadable<AsepriteSpriteSheet> {
         }
     }
 
-
-
     public async load(): Promise<AsepriteSpriteSheet> {
         const asepriteData = await this._resource.load();
         const imagepath = this.convertPath(this._resource.path, asepriteData.meta.image);

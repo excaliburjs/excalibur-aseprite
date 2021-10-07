@@ -7,7 +7,10 @@
   "scripts": {
     "start": "webpack-dev-server --config webpack.config.test.js --open",
     "watch": "webpack --progress --watch",
-    "build": "webpack --mode production"
+    "build": "webpack --mode production",
+    "test:unit": "karma start",
+    "test:integration": "webpack --config webpack.config.test.js && ex-test -d ./example -t ./test/integration/test.js",
+    "test": "npm run test:unit && npm run test:integration"
   },
   "repository": {
     "type": "git",
@@ -20,13 +23,24 @@
   },
   "homepage": "https://github.com/excaliburjs/excalibur-aseprite#readme",
   "devDependencies": {
+    "@excaliburjs/testing": "0.25.0",
+    "@types/jasmine": "3.9.1",
+    "@types/webpack-env": "1.16.2",
     "acorn": "8.5.0",
     "excalibur": "0.25.0",
+    "jasmine": "3.9.0",
+    "karma": "6.3.4",
+    "karma-chrome-launcher": "3.1.0",
+    "karma-jasmine": "4.0.1",
+    "karma-webpack": "5.0.0",
     "raw-loader": "4.0.2",
     "ts-loader": "9.2.6",
     "typescript": "4.4.3",
     "webpack": "5.56.1",
     "webpack-cli": "4.8.0",
     "webpack-dev-server": "4.3.1"
+  },
+  "peerDependencies": {
+    "excalibur": "0.25.0"
   }
 }
