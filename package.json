@@ -24,7 +24,7 @@
   "homepage": "https://github.com/excaliburjs/excalibur-aseprite#readme",
   "devDependencies": {
     "@excaliburjs/testing": "0.25.0",
-    "@types/jasmine": "3.10.0",
+    "@types/jasmine": "3.10.1",
     "@types/webpack-env": "1.16.3",
     "acorn": "8.5.0",
     "excalibur": "0.25.0",
