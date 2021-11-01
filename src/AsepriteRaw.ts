@@ -1,13 +1,8 @@
+import { AsepriteRawFrame } from './AsepriteRawFrame';
+
 export class AsepriteRaw {
     frames!: {
-        [key: string]: { 
-            frame: { x: number, y: number, w: number, h: number },
-            rotated: boolean,
-            trimmed: boolean,
-            spriteSourceSize: { x: number, y: number, w: number, h: number },
-            sourceSize: { w: number, h: number },
-            duration: number
-        }
+        [key: string]: AsepriteRawFrame,
     }
     meta!: {
         image: string,

@@ -5,12 +5,14 @@ import { AsepriteSpriteSheet } from './AsepriteSpriteSheet';
 
 export class AsepriteResource implements Loadable<AsepriteSpriteSheet> {
     private _resource: Resource<AsepriteRaw>;
+    private _imagePath?: string;
     public data!: AsepriteSpriteSheet;
     public rawAseprite!: AsepriteRaw;
     public image!: ImageSource;
 
     public convertPath: (originPath: string, relativePath: string) => string;
-    constructor(path: string, public bustCache = false) {
+    constructor(path: string, public bustCache = false, imagePath?: string) {
+        this._imagePath = imagePath;
         this._resource = new Resource(path, 'json', bustCache);
         this.convertPath = (originPath: string, relativePath: string) => {
             // Use absolute path if specified
@@ -30,8 +32,8 @@ export class AsepriteResource implements Loadable<AsepriteSpriteSheet> {
 
     public async load(): Promise<AsepriteSpriteSheet> {
         const asepriteData = await this._resource.load();
-        const imagepath = this.convertPath(this._resource.path, asepriteData.meta.image);
-        const spriteSheetImage = new ImageSource(imagepath, this.bustCache);
+        const imagePath = this.convertPath(this._resource.path, this._imagePath || asepriteData.meta.image);
+        const spriteSheetImage = new ImageSource(imagePath, this.bustCache);
         await spriteSheetImage.load();
         this.rawAseprite = asepriteData;
         this.image = spriteSheetImage;
