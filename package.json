@@ -27,7 +27,7 @@
     "@types/jasmine": "3.10.2",
     "@types/webpack-env": "1.16.3",
     "acorn": "8.5.0",
-    "excalibur": "0.25.0",
+    "excalibur": "0.25.1",
     "jasmine": "3.10.0",
     "karma": "6.3.7",
     "karma-chrome-launcher": "3.1.0",
@@ -41,6 +41,6 @@
     "webpack-dev-server": "4.4.0"
   },
   "peerDependencies": {
-    "excalibur": "0.25.0"
+    "excalibur": "0.25.1"
   }
 }
