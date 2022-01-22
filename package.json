@@ -1,6 +1,6 @@
 {
   "name": "@excaliburjs/plugin-aseprite",
-  "version": "0.25.0",
+  "version": "0.25.2",
   "description": "Aseprite Resource Plugin for Excalibur",
   "main": "./dist/excalibur-aseprite.js",
   "typings": "./dist/src/index.d.ts",
@@ -41,6 +41,6 @@
     "webpack-dev-server": "4.7.3"
   },
   "peerDependencies": {
-    "excalibur": "0.25.1"
+    "excalibur": "0.25.2"
   }
 }
