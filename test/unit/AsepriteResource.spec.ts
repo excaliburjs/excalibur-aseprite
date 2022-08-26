@@ -47,4 +47,18 @@ describe('An Aseprite Resource', () => {
         expect(spriteSheet?.getSprite(0, 0)?.width).toBe(64);
         expect(spriteSheet?.getSprite(0, 0)?.height).toBe(64);
     });
+
+    it ('can clone', async () => {
+        const sut = new AsepriteResource('test/unit/beetle.json');
+        await sut.load();
+
+        const clone = sut.clone();
+
+        expect(sut).not.toBe(clone);
+        expect(clone).toBeDefined();
+        expect(clone.isLoaded()).toBe(true);
+        expect(clone.rawAseprite).toBe(sut.rawAseprite);
+        expect(clone.image).toBe(sut.image);
+        expect(clone.data).toBeDefined();    
+    })
 });
