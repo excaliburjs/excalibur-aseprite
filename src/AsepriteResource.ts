@@ -60,7 +60,7 @@ export class AsepriteResource implements Loadable<AsepriteSpriteSheet> {
         clone.rawAseprite = this.rawAseprite;
         clone.image = this.image;
 
-        return clone
+        return clone;
     }
 
     isLoaded(): boolean {
