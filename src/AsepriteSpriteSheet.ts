@@ -73,4 +73,8 @@ export class AsepriteSpriteSheet {
         }
         return this._animations.get(name) as Animation;
     }
+
+    clone() {
+        return new AsepriteSpriteSheet(this.asepriteRaw, this.image);
+    }
 }
