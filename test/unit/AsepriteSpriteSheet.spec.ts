@@ -68,4 +68,41 @@ describe('An AsepriteSpriteSheet Parser', () => {
         expect(frame1OfAnim3.sourceView.x).toBe(0);
         expect(anim3.strategy).toBe(AnimationStrategy.PingPong);
     });
+
+    it('can clone', () => {
+        const raw: AsepriteRaw = {
+            meta: {
+                image: './path/to/image',
+                size: { w: 20, h: 20 },
+                scale: 1,
+                format: 'RGBA8888',
+                layers: [],
+                frameTags: [
+                    { name: "anim1", from: 0, to: 1, direction: "forward"},
+                ],
+                slices: []
+            },
+            frames: {
+                "frame1": {
+                    frame: { x: 0, y: 0, w: 10, h: 10},
+                    rotated: false,
+                    trimmed: false,
+                    spriteSourceSize: { x: 0, y: 0, w: 10, h: 10 },
+                    sourceSize: { w: 10, h: 10 },
+                    duration: 500
+                }
+            }
+        }
+
+
+        const aseprite = new AsepriteSpriteSheet(raw, new ImageSource('./path/to/some/image'));
+
+        const clone = aseprite.clone();
+
+        expect(clone).toBeDefined();
+        expect(clone).not.toBe(aseprite);
+        expect(aseprite.asepriteRaw).toEqual(clone.asepriteRaw);
+        expect(aseprite.image).toEqual(clone.image);
+        expect(clone.getAnimation('anim1')).not.toBe(aseprite.getAnimation('anim1'));
+    })
 });
