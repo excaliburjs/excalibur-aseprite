@@ -54,6 +54,14 @@ export class AsepriteResource implements Loadable<AsepriteSpriteSheet> {
         }
     }
 
+    public clone() {
+        const clone = new AsepriteResource(this._resource.path, this.bustCache);        
+        clone.data = this.data.clone();
+        clone.rawAseprite = this.rawAseprite;
+        clone.image = this.image;
+
+        return clone;
+    }
 
     isLoaded(): boolean {
         return !!this.data;
