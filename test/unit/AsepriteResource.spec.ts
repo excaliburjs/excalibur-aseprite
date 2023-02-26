@@ -16,6 +16,16 @@ describe('An Aseprite Resource', () => {
         expect(sut.rawAseprite).toBeDefined();
     });
 
+    it('can load a resource with custom image path', async () => {
+        const sut = new AsepriteResource('test/unit/beetle.json', false, 'beetle.png');
+        await sut.load();
+
+        expect(sut.isLoaded());
+        expect(sut.image).toBeDefined();
+        expect(sut.image.path).toBe('test/unit/beetle.png');
+        expect(sut.rawAseprite).toBeDefined();
+    });
+
     it('will log a warning if not yet loaded', () => {
         const sut = new AsepriteResource('test/unit/beetle.json');
         const logger = Logger.getInstance();

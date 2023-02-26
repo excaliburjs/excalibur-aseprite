@@ -6,7 +6,7 @@ export class AsepriteSpriteSheet {
     private _spriteSheet: SpriteSheet;
     private _animations = new Map<string, Animation>()
     constructor(public asepriteRaw: AsepriteRaw, public image: ImageSource) {
-        for (let frameTag of asepriteRaw.meta.frameTags) {
+        for (let frameTag of asepriteRaw.meta.frameTags || []) {
             let from = frameTag.from;
             let to = frameTag.to;
             let frameIndices = range(from, to);
