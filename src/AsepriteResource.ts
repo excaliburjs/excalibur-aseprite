@@ -1,17 +1,33 @@
-import { ImageSource, Loadable, Logger, Resource, SpriteSheet } from 'excalibur';
+import { ImageSource, Loadable, Logger, Resource, SpriteSheet, Animation } from 'excalibur';
 import { AsepriteRaw } from './AsepriteRaw';
 import { AsepriteSpriteSheet } from './AsepriteSpriteSheet';
+import { AsepriteNativeParser } from './AsepriteNativeParser';
 
 
 export class AsepriteResource implements Loadable<AsepriteSpriteSheet> {
-    private _resource: Resource<AsepriteRaw>;
+    private _path: string;
+    private _type: 'native' | 'json' = 'native';
+    private _resource: Resource<AsepriteRaw> | undefined;
+    private _nativeResource: Resource<ArrayBuffer>| undefined;
     public data!: AsepriteSpriteSheet;
     public rawAseprite!: AsepriteRaw;
     public image!: ImageSource;
 
+    private _nativeParser: AsepriteNativeParser | undefined;
+
     public convertPath: (originPath: string, relativePath: string) => string;
     constructor(path: string, public bustCache = false) {
-        this._resource = new Resource(path, 'json', bustCache);
+        this._path = path;
+        // if this is a .ase/.aseprite download as an arraybuffer 
+        // fixme: endsWith is problematic for paths that end with a querystring or hash
+        if (path.endsWith('.ase') || path.endsWith('.aseprite')) {
+            this._nativeResource = new Resource<ArrayBuffer>(path, "arraybuffer", bustCache);
+            this._type = 'native';
+        } else {
+            this._resource = new Resource(path, 'json', bustCache);
+            this._type = 'json';
+        }
+
         this.convertPath = (originPath: string, relativePath: string) => {
             // Use absolute path if specified
             if (relativePath.indexOf('/') === 0) {
@@ -29,13 +45,49 @@ export class AsepriteResource implements Loadable<AsepriteSpriteSheet> {
     }
 
     public async load(): Promise<AsepriteSpriteSheet> {
-        const asepriteData = await this._resource.load();
-        const imagepath = this.convertPath(this._resource.path, asepriteData.meta.image);
-        const spriteSheetImage = new ImageSource(imagepath, this.bustCache);
-        await spriteSheetImage.load();
-        this.rawAseprite = asepriteData;
-        this.image = spriteSheetImage;
-        return this.data = new AsepriteSpriteSheet(asepriteData, spriteSheetImage);
+        if (this._type === 'json' && this._resource) {
+            const asepriteData = await this._resource.load();
+            const imagepath = this.convertPath(this._resource.path, asepriteData.meta.image);
+            const spriteSheetImage = new ImageSource(imagepath, this.bustCache);
+            await spriteSheetImage.load();
+            this.rawAseprite = asepriteData;
+            this.image = spriteSheetImage;
+            return this.data = new AsepriteSpriteSheet(asepriteData, spriteSheetImage);
+        } else {
+            // type is 'native'
+            const arraybuffer = await this._nativeResource?.load();
+
+            if (arraybuffer) {
+                this._nativeParser = new AsepriteNativeParser(arraybuffer);
+    
+                await this._nativeParser.parse();
+            }
+
+            const frames = this._nativeParser!.getFrames();
+
+            // FIXME
+            return this.data = new AsepriteSpriteSheet({
+                frames: {
+                    0 : {
+                        frame: { x: 0, y: 0, w: 64, h: 64 },
+                        rotated: false,
+                        trimmed: false,
+                        spriteSourceSize: { x: 0, y: 0, w: 64, h: 64 },
+                        sourceSize: { w: 64, h: 64 },
+                        duration: 500
+                    }
+                },
+                meta: {
+                    image: 'tbd',
+                    size: { w: 0, h: 0 },
+                    scale: 1,
+                    format: 'string',
+                    layers: [],
+                    frameTags: [],
+                    slices: []
+                }
+            }, null as unknown as ImageSource); 
+        }
     }
 
     public getSpriteSheet() {
@@ -46,16 +98,21 @@ export class AsepriteResource implements Loadable<AsepriteSpriteSheet> {
         }
     }
 
-    public getAnimation(name: string) {
+    public getAnimation(name: string): Animation | null {
         if (this.isLoaded()) {
-            return this.data.getAnimation(name);
+            if (this._type === 'json'){
+                return this.data.getAnimation(name);
+            } else {
+                return new Animation({ frames: this._nativeParser!.getFrames() });
+            }
         } else {
             Logger.getInstance().warn('AspriteResource must be loaded before .getAnimation() is called');
         }
+        return null;
     }
 
     public clone() {
-        const clone = new AsepriteResource(this._resource.path, this.bustCache);        
+        const clone = new AsepriteResource(this._path, this.bustCache);
         clone.data = this.data.clone();
         clone.rawAseprite = this.rawAseprite;
         clone.image = this.image;
