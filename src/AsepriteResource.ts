@@ -13,13 +13,22 @@ export class AsepriteResource implements Loadable<AsepriteSpriteSheet> {
     private _nativeResource: Resource<ArrayBuffer>| undefined;
     private _nativeParser: AsepriteNativeParser | undefined;
     public data!: AsepriteSpriteSheet;
-
     public convertPath: (originPath: string, relativePath: string) => string;
+
+    private _hasFileExtension(path: string, extension: string) {
+        const fileExtension = /.*\.([A-Za-z0-9]+)(?:(?:\?|\#).*)*$/;
+        if (path) {
+            const ext = path.match(fileExtension);
+            if (ext?.length) {
+                return ext[1] === extension;
+            }
+        }
+        return false;
+    }
     constructor(path: string, public bustCache = false) {
         this._path = path;
         // if this is a .ase/.aseprite download as an arraybuffer 
-        // fixme: endsWith is problematic for paths that end with a querystring or hash
-        if (path.endsWith('.ase') || path.endsWith('.aseprite')) {
+        if (this._hasFileExtension(path, 'ase')  || this._hasFileExtension(path, 'aseprite')) {
             this._nativeResource = new Resource<ArrayBuffer>(path, "arraybuffer", bustCache);
             this._type = 'native';
         } else {
@@ -94,8 +103,6 @@ export class AsepriteResource implements Loadable<AsepriteSpriteSheet> {
     public clone() {
         const clone = new AsepriteResource(this._path, this.bustCache);
         clone.data = this.data.clone();
-        // clone.rawAseprite = this.rawAseprite;
-        // clone.image = this.image;
 
         return clone;
     }
