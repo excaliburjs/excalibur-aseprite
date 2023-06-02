@@ -11,9 +11,6 @@ describe('An Aseprite Resource', () => {
         await sut.load();
 
         expect(sut.isLoaded());
-        expect(sut.image).toBeDefined();
-        expect(sut.image.path).toBe('test/unit/beetle.png');
-        expect(sut.rawAseprite).toBeDefined();
     });
 
     it('will log a warning if not yet loaded', () => {
@@ -57,8 +54,6 @@ describe('An Aseprite Resource', () => {
         expect(sut).not.toBe(clone);
         expect(clone).toBeDefined();
         expect(clone.isLoaded()).toBe(true);
-        expect(clone.rawAseprite).toBe(sut.rawAseprite);
-        expect(clone.image).toBe(sut.image);
-        expect(clone.data).toBeDefined();    
+        expect(clone.data).toBeDefined();
     })
 });

@@ -1,11 +1,29 @@
-import { Color, Frame, ImageSource } from "excalibur";
+import { Animation, AnimationStrategy, Color, Frame, ImageSource, Sprite, SpriteSheet } from "excalibur";
 import { inflate } from 'pako';
+import { AsepriteSpriteSheet } from "./AsepriteSpriteSheet";
+
+export const AnimationTypes = {
+    Forward: 0,
+    Reverse: 1,
+    PingPong: 2,
+    PingPongReverse: 3
+}
+
+export interface AnimationTag {
+    name: string;
+    from: number;
+    to: number;
+    type: number;
+    repeat: number;
+}
 
 export class AsepriteNativeParser {
     private _cursor = 0;
     private _frames: number = 0;
     private _dataView: DataView;
     private _exFrames: Frame[] = [];
+    private _sprites: Sprite[] = [];
+    private _tags: Map<string, AnimationTag> = new Map<string, AnimationTag>();
     private _canvasFrames: CanvasRenderingContext2D[] = [];
     public height: number = 0;
     public width: number = 0;
@@ -19,6 +37,8 @@ export class AsepriteNativeParser {
         // After parsing the header we know the dimension and the number of frames
         for (let i = 0; i < this._frames; i++) {
             const canvas = document.createElement('canvas');
+            canvas.width = this.width;
+            canvas.height = this.height;
             const ctx = canvas.getContext('2d');
             ctx!.imageSmoothingEnabled = false;
             this._canvasFrames.push(ctx!);
@@ -26,8 +46,57 @@ export class AsepriteNativeParser {
         }
     }
 
+    public getAsepriteSheet() {
+        return new AsepriteSpriteSheet(
+            this.getSpriteSheet(),
+            this.getAnimations()
+        );
+    }
+
     public getFrames(): Frame[] {
         return this._exFrames;
+    }
+
+    public getSpriteSheet(): SpriteSheet {
+        const spriteSheet = new SpriteSheet({
+            sprites: this._sprites
+        })
+        return spriteSheet;
+    }
+
+    public getAnimations(): Map<string, Animation> {
+        const result = new Map<string, Animation>();
+        for (let tag of this._tags.keys()) {
+            result.set(tag, this.getAnimation(tag));
+        }
+        return result;
+    }
+
+    public getAnimation(name: string): Animation {
+        const animationTag = this._tags.get(name);
+        if (!animationTag) throw Error(`No animation by name [${name}] in aseprite file`);
+
+        const frames = this._exFrames.slice(animationTag.from, animationTag.to + 1);
+
+        const type = animationTag.type;
+        let strategy = AnimationStrategy.End;
+        if (type === AnimationTypes.Forward) {
+            strategy = AnimationStrategy.End;
+        } else if (type === AnimationTypes.PingPong || type === AnimationTypes.PingPongReverse) {
+            strategy = AnimationStrategy.PingPong;
+        }
+
+        let reverse = false;
+        if (type === AnimationTypes.Reverse || type === AnimationTypes.PingPongReverse) {
+            reverse = true;
+        }
+
+        const animation = new Animation({
+            frames: frames,
+            strategy,
+            reverse
+        });
+        return animation;
     }
 
     private async _parseFrame(ctx: CanvasRenderingContext2D) {
@@ -47,12 +116,15 @@ export class AsepriteNativeParser {
         }
 
         // After parsing the chunks I have the image information
+        // TODO update excalibur so that we can make an ImageSource from a canvas
         const rawImage = ctx.canvas.toDataURL("image/png");
         const imageSource = new ImageSource(rawImage);
         await imageSource.load();
+        const sprite = imageSource.toSprite();
+        this._sprites.push(sprite);
         this._exFrames.push({
             duration: frameDurationMs,
-            graphic: imageSource.toSprite()
+            graphic: sprite
         })
     }
 
@@ -93,8 +165,31 @@ export class AsepriteNativeParser {
                 const imageBitmap = await createImageBitmap(imageData)
                 ctx.drawImage(imageBitmap, xPos, yPos);
             }
-        } 
-        
+        }
+        // Tags chunk 0x2018
+        else if (type === 0x2018) {
+            const numberOfTags = this._readWORD();
+            this._advanceBytes(8);
+            for (let i = 0; i < numberOfTags; i++) {
+                const from = this._readWORD();
+                const to = this._readWORD();
+                const type = this._readBYTE();
+                const repeat = this._readWORD();
+                this._advanceBytes(6);
+                // tag color ignore
+                this._advanceBytes(3);
+                this._advanceBytes(1);
+                const name = this._readString();
+
+                this._tags.set(name, {
+                    name,
+                    from,
+                    to,
+                    type,
+                    repeat
+                })
+            }
+        }
         // else if (type === 0x2007) {
         //     // Color profile 0x2007
         //     // Should 22 bytes???
@@ -115,7 +210,7 @@ export class AsepriteNativeParser {
         // External files 0x2008
         // Mask chunk 0x2016 (Deprecated)
         // Path chunk 0x2017 (Not used)
-        // Tags chunk 0x2018
+        
         // Palette 0x2019
         // User data 0x2020
         // Slice 0x2022
@@ -170,6 +265,15 @@ export class AsepriteNativeParser {
         const gridHeight = this._readWORD();
 
         this._advanceBytes(84);
+    }
+
+
+    private _readString(): string {
+        const length = this._readWORD();
+        const stringBytes = this._readBytes(length);
+        const decorder = new TextDecoder();
+        const str = decorder.decode(stringBytes);
+        return str;
     }
 
     private _readBytes(n: number): Uint8Array {

@@ -1,19 +1,18 @@
 import { ImageSource, Loadable, Logger, Resource, SpriteSheet, Animation } from 'excalibur';
-import { AsepriteRaw } from './AsepriteRaw';
+import { AsepriteRawJson } from './AsepriteRawJson';
 import { AsepriteSpriteSheet } from './AsepriteSpriteSheet';
 import { AsepriteNativeParser } from './AsepriteNativeParser';
+import { AsepriteJsonParser } from './AsepriteJsonParser';
 
 
 export class AsepriteResource implements Loadable<AsepriteSpriteSheet> {
     private _path: string;
     private _type: 'native' | 'json' = 'native';
-    private _resource: Resource<AsepriteRaw> | undefined;
+    private _jsonResource: Resource<AsepriteRawJson> | undefined;
+    private _jsonParser: AsepriteJsonParser | undefined;
     private _nativeResource: Resource<ArrayBuffer>| undefined;
-    public data!: AsepriteSpriteSheet;
-    public rawAseprite!: AsepriteRaw;
-    public image!: ImageSource;
-
     private _nativeParser: AsepriteNativeParser | undefined;
+    public data!: AsepriteSpriteSheet;
 
     public convertPath: (originPath: string, relativePath: string) => string;
     constructor(path: string, public bustCache = false) {
@@ -24,7 +23,7 @@ export class AsepriteResource implements Loadable<AsepriteSpriteSheet> {
             this._nativeResource = new Resource<ArrayBuffer>(path, "arraybuffer", bustCache);
             this._type = 'native';
         } else {
-            this._resource = new Resource(path, 'json', bustCache);
+            this._jsonResource = new Resource(path, 'json', bustCache);
             this._type = 'json';
         }
 
@@ -45,14 +44,16 @@ export class AsepriteResource implements Loadable<AsepriteSpriteSheet> {
     }
 
     public async load(): Promise<AsepriteSpriteSheet> {
-        if (this._type === 'json' && this._resource) {
-            const asepriteData = await this._resource.load();
-            const imagepath = this.convertPath(this._resource.path, asepriteData.meta.image);
+        if (this._type === 'json' && this._jsonResource) {
+            const asepriteData = await this._jsonResource.load();
+            const imagepath = this.convertPath(this._jsonResource.path, asepriteData.meta.image);
             const spriteSheetImage = new ImageSource(imagepath, this.bustCache);
             await spriteSheetImage.load();
-            this.rawAseprite = asepriteData;
-            this.image = spriteSheetImage;
-            return this.data = new AsepriteSpriteSheet(asepriteData, spriteSheetImage);
+
+            this._jsonParser = new AsepriteJsonParser(asepriteData, spriteSheetImage);
+            this._jsonParser.parse();
+
+            return this.data = this._jsonParser.getAsepriteSheet();
         } else {
             // type is 'native'
             const arraybuffer = await this._nativeResource?.load();
@@ -61,32 +62,11 @@ export class AsepriteResource implements Loadable<AsepriteSpriteSheet> {
                 this._nativeParser = new AsepriteNativeParser(arraybuffer);
     
                 await this._nativeParser.parse();
+            } else {
+                throw Error(`Could not load aseprite resource ${this._path}`);
             }
 
-            const frames = this._nativeParser!.getFrames();
-
-            // FIXME
-            return this.data = new AsepriteSpriteSheet({
-                frames: {
-                    0 : {
-                        frame: { x: 0, y: 0, w: 64, h: 64 },
-                        rotated: false,
-                        trimmed: false,
-                        spriteSourceSize: { x: 0, y: 0, w: 64, h: 64 },
-                        sourceSize: { w: 64, h: 64 },
-                        duration: 500
-                    }
-                },
-                meta: {
-                    image: 'tbd',
-                    size: { w: 0, h: 0 },
-                    scale: 1,
-                    format: 'string',
-                    layers: [],
-                    frameTags: [],
-                    slices: []
-                }
-            }, null as unknown as ImageSource); 
+            return this.data = this._nativeParser.getAsepriteSheet();
         }
     }
 
@@ -103,7 +83,7 @@ export class AsepriteResource implements Loadable<AsepriteSpriteSheet> {
             if (this._type === 'json'){
                 return this.data.getAnimation(name);
             } else {
-                return new Animation({ frames: this._nativeParser!.getFrames() });
+                return this._nativeParser!.getAnimation(name);
             }
         } else {
             Logger.getInstance().warn('AspriteResource must be loaded before .getAnimation() is called');
@@ -114,8 +94,8 @@ export class AsepriteResource implements Loadable<AsepriteSpriteSheet> {
     public clone() {
         const clone = new AsepriteResource(this._path, this.bustCache);
         clone.data = this.data.clone();
-        clone.rawAseprite = this.rawAseprite;
-        clone.image = this.image;
+        // clone.rawAseprite = this.rawAseprite;
+        // clone.image = this.image;
 
         return clone;
     }

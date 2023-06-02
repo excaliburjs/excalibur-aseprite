@@ -1,4 +1,4 @@
-import { Actor, DisplayMode, Engine, Loader, Sprite, vec } from "excalibur";
+import { Actor, Animation, DisplayMode, Engine, Loader, Sprite, vec } from "excalibur";
 import { AsepriteResource } from "@excalibur-aseprite";
 
 const game = new Engine({
@@ -12,7 +12,7 @@ const asepriteSpriteSheet = new AsepriteResource('./beetle.aseprite');
 const loader = new Loader([asepriteSpriteSheet]);
 game.start(loader).then(()=>{
     const a = new Actor({pos: vec(100, 100)});
-    a.graphics.use(asepriteSpriteSheet.getAnimation('Loop') as any);
+    a.graphics.use(asepriteSpriteSheet.getAnimation('Loop') as Animation);
 
     // const spritesheet = asepriteSpriteSheet.getSpriteSheet();
     // const sprite = spritesheet?.getSprite(0, 1) as Sprite;
