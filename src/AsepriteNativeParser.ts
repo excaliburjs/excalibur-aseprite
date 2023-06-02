@@ -19,12 +19,15 @@ export interface AnimationTag {
 
 export class AsepriteNativeParser {
     private _cursor = 0;
+    private _colorDepth: 'RGBA' | 'Grayscale' | 'Indexed' = 'RGBA';
+    private _transparentIndex = 0;
     private _frames: number = 0;
     private _dataView: DataView;
     private _exFrames: Frame[] = [];
     private _sprites: Sprite[] = [];
     private _tags: Map<string, AnimationTag> = new Map<string, AnimationTag>();
     private _canvasFrames: CanvasRenderingContext2D[] = [];
+    private _indexedColors = new Map<number, Color>();
     public height: number = 0;
     public width: number = 0;
     constructor(public arraybuffer: ArrayBuffer) {
@@ -152,6 +155,11 @@ export class AsepriteNativeParser {
                 for (let i = 0; i < width * height; i++) {
                     pixels.push(this._readPixel());
                 }
+            // Linked cell
+            } else if (cellType === 1) {
+                const framePosition = this._readWORD();
+                // FIXME figure out what to do here
+            // Compressed image data
             } else if (cellType === 2) {
                 const width = this._readWORD();
                 const height = this._readWORD();
@@ -160,10 +168,15 @@ export class AsepriteNativeParser {
                 const sizeToRead = size - (currentCursor - startCursor);
                 const compressed = this._readBytes(sizeToRead);
                 const decompressed = inflate(compressed);
-                const data = new Uint8ClampedArray(decompressed);
+                const transformed = this._transformImageDataToRGBA(decompressed);
+                const data = new Uint8ClampedArray(transformed);
+                // TODO how do we handle different image data? RGBA, Grayscale, Indexed
                 const imageData = new ImageData(data, width, height);
-                const imageBitmap = await createImageBitmap(imageData)
+                const imageBitmap = await createImageBitmap(imageData);
                 ctx.drawImage(imageBitmap, xPos, yPos);
+            // Compressed tilemap
+            } else if (cellType === 3) {
+                // TODO tilemap support
             }
         }
         // Tags chunk 0x2018
@@ -190,6 +203,26 @@ export class AsepriteNativeParser {
                 })
             }
         }
+        // Palette 0x2019
+        else if (type === 0x2019) {
+            const paletteSize = this._readDWORD();
+            const firstIndex = this._readDWORD();
+            const lastIndex = this._readDWORD();
+            this._readBytes(8);
+            // + For each palette entry in [from,to] range (to-from+1 entries)
+            for (let i = firstIndex; i < (lastIndex - firstIndex + 1); i++) {
+                const entryFlags = this._readWORD();
+                const red = this._readBYTE();
+                const green = this._readBYTE();
+                const blue = this._readBYTE();
+                const alpha = this._readBYTE();
+                this._indexedColors.set(i, new Color(red, green, blue, alpha/255));
+                if (entryFlags === 1) {
+                    const name = this._readString();
+                }
+            }
+        }
+
         // else if (type === 0x2007) {
         //     // Color profile 0x2007
         //     // Should 22 bytes???
@@ -231,13 +264,12 @@ export class AsepriteNativeParser {
         this.height = this._readWORD();
 
         const colorDepthBpp = this._readWORD();
-        let colorDepth: 'RGBA' | 'Grayscale' | 'Indexed' = 'RGBA';
         if (colorDepthBpp === 32) {
-            colorDepth = 'RGBA'
+            this._colorDepth = 'RGBA'
         } else if (colorDepthBpp === 16) {
-            colorDepth = 'Grayscale'
+            this._colorDepth = 'Grayscale'
         } else if (colorDepthBpp === 8) {
-            colorDepth = 'Indexed'
+            this._colorDepth = 'Indexed'
         }
 
         const flags = this._readDWORD();
@@ -249,6 +281,7 @@ export class AsepriteNativeParser {
         this._readDWORD();
 
         const transparentIndex = this._readBYTE();
+        this._transparentIndex = transparentIndex;
 
         // ignore these bytes
         this._advanceBytes(3);
@@ -267,6 +300,39 @@ export class AsepriteNativeParser {
         this._advanceBytes(84);
     }
 
+    private _transformImageDataToRGBA(data: Uint8Array) {
+        if (this._colorDepth === 'Grayscale') {
+            const numPixels = (data.byteLength / 2) * 4;
+            const resultPixels = new Uint8Array(numPixels);
+            for (let i = 0; i < numPixels; i += 4) {
+                const source = Math.floor(i / 4) * 2;
+                resultPixels[i + 0] = data[source + 0];
+                resultPixels[i + 1] = data[source + 0];
+                resultPixels[i + 2] = data[source + 0];
+                resultPixels[i + 3] = data[source + 1];
+            }
+            return resultPixels;
+        } else if (this._colorDepth === 'Indexed') {
+            const numPixels = data.byteLength * 4;
+            const resultPixels = new Uint8Array(numPixels);
+            for (let i = 0;  i < numPixels; i += 4) {
+                const source = Math.floor(i / 4);
+                let color = Color.Transparent;
+                if (data[source] === this._transparentIndex) {
+                    color = Color.Transparent;
+                } else {
+                    color = this._indexedColors.get(data[source]) ?? Color.Transparent;
+                }
+                resultPixels[i + 0] = color.r;
+                resultPixels[i + 1] = color.g;
+                resultPixels[i + 2] = color.b;
+                resultPixels[i + 3] = Math.ceil(color.a * 255);
+            }
+            return resultPixels;
+        }
+        return data;
+    }
+
 
     private _readString(): string {
         const length = this._readWORD();
@@ -283,6 +349,10 @@ export class AsepriteNativeParser {
     }
 
     private _readPixel(): Color {
+        // TODO needs to change based on the image pixel format!
+        // RGBA BYTE[4]
+        // Grayscale BYTE[2]
+        // Indexed BYTE
         const r = this._dataView.getInt16(this._cursor, true);
         this._cursor += 2;
         const g = this._dataView.getInt16(this._cursor, true);
