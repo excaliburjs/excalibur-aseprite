@@ -117,7 +117,7 @@ export class AsepriteNativeParser {
             await this._parseChunk(ctx);
         }
 
-        // After parsing the chunks I have the image information
+        // After parsing the chunks we have the image information for the frame
         // TODO update excalibur so that we can make an ImageSource from a canvas
         const rawImage = ctx.canvas.toDataURL("image/png");
         const imageSource = new ImageSource(rawImage);
@@ -134,9 +134,7 @@ export class AsepriteNativeParser {
         const startCursor = this._cursor;
         const size = this._readDWORD();
         const type = this._readWORD();
-        // Old palette chunk 0x0004
-        // Old palette chunk 0x0011
-        // Layer chunk 0x2004
+        
         // Cel Chunk 0x2005
         if (type === 0x2005) { // 8197
             const layerIndex = this._readWORD();
@@ -148,16 +146,14 @@ export class AsepriteNativeParser {
             this._advanceBytes(5);
             // raw image data
             if (cellType === 0) {
-                const width = this._readWORD();
-                const height = this._readWORD();
-                let pixels: Color[] = [];
-                for (let i = 0; i < width * height; i++) {
-                    pixels.push(this._readPixel());
-                }
+                // Unused according to the spec
+                throw Error('Unexpected raw image data');
             // Linked cell
             } else if (cellType === 1) {
                 const framePosition = this._readWORD();
-                // FIXME figure out what to do here
+                // Copy the linked frame into this context
+                const linkedFrame = this._canvasFrames[framePosition];
+                ctx.drawImage(linkedFrame.canvas, 0, 0);
             // Compressed image data
             } else if (cellType === 2) {
                 const width = this._readWORD();
@@ -171,7 +167,10 @@ export class AsepriteNativeParser {
                 const data = new Uint8ClampedArray(transformed);
                 const imageData = new ImageData(data, width, height);
                 const imageBitmap = await createImageBitmap(imageData);
+                ctx.save();
+                ctx.globalAlpha = opacity/255;
                 ctx.drawImage(imageBitmap, xPos, yPos);
+                ctx.restore();
             // Compressed tilemap
             } else if (cellType === 3) {
                 // TODO tilemap support
@@ -220,33 +219,22 @@ export class AsepriteNativeParser {
                 }
             }
         }
+        // Currently unsupported chunks
 
-        // else if (type === 0x2007) {
-        //     // Color profile 0x2007
-        //     // Should 22 bytes???
-        //     const type = this._readWORD();
-        //     const flags = this._readDWORD();
-        //     const gamma = this._readFixed();
-        //     this._advanceBytes(8);
-        //     if (type === 2) {
-        //         const iccLength = this._readDWORD();
-        //         // const iccProfileData = byte[]
-        //         this._advanceBytes(iccLength);
-        //     }
-        // } 
-        else {
-            this._advanceBytes(size - 6);
-        }
+        // Old palette chunk 0x0004
+        // Old palette chunk 0x0011
+        // Layer chunk 0x2004
+        // Color profile 0x2007
         // Extra Cel Chunk 0x2006
         // External files 0x2008
         // Mask chunk 0x2016 (Deprecated)
         // Path chunk 0x2017 (Not used)
-        
-        // Palette 0x2019
         // User data 0x2020
         // Slice 0x2022
         // Tileset 0x2023
-        // Depending on the type do other stuff
+        else {
+            this._advanceBytes(size - 6);
+        }
     }
 
     private _parseHeader() {
