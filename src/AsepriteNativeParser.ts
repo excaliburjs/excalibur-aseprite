@@ -114,7 +114,6 @@ export class AsepriteNativeParser {
         const numChunks = newChunks === 0 ? oldChunks : newChunks;
 
         for (let i = 0; i < numChunks; i++) {
-            // TODO parse chunk
             await this._parseChunk(ctx);
         }
 
@@ -170,7 +169,6 @@ export class AsepriteNativeParser {
                 const decompressed = inflate(compressed);
                 const transformed = this._transformImageDataToRGBA(decompressed);
                 const data = new Uint8ClampedArray(transformed);
-                // TODO how do we handle different image data? RGBA, Grayscale, Indexed
                 const imageData = new ImageData(data, width, height);
                 const imageBitmap = await createImageBitmap(imageData);
                 ctx.drawImage(imageBitmap, xPos, yPos);
@@ -253,10 +251,11 @@ export class AsepriteNativeParser {
 
     private _parseHeader() {
         // https://github.com/aseprite/aseprite/blob/main/docs/ase-file-specs.md
-        const dataView = new DataView(this.arraybuffer);
         const fileSize = this._readDWORD();
-        // TODO check magic number is 42464 in decimal 0xA5E0
         const magicNumber = this._readWORD();
+        if (magicNumber !== 0xA5E0) {
+            throw Error('Aseprite file corrupted! Header invalid')
+        }
         const frames = this._readWORD();
         this._frames = frames;
 
@@ -349,19 +348,28 @@ export class AsepriteNativeParser {
     }
 
     private _readPixel(): Color {
-        // TODO needs to change based on the image pixel format!
         // RGBA BYTE[4]
         // Grayscale BYTE[2]
         // Indexed BYTE
-        const r = this._dataView.getInt16(this._cursor, true);
-        this._cursor += 2;
-        const g = this._dataView.getInt16(this._cursor, true);
-        this._cursor += 2;
-        const b = this._dataView.getInt16(this._cursor, true);
-        this._cursor += 2;
-        const a = this._dataView.getInt16(this._cursor, true);
-        this._cursor += 2;
-        return new Color(r, g, b, a/255);
+        if (this._colorDepth === 'RGBA') {
+            const r = this._dataView.getInt16(this._cursor, true);
+            this._cursor += 2;
+            const g = this._dataView.getInt16(this._cursor, true);
+            this._cursor += 2;
+            const b = this._dataView.getInt16(this._cursor, true);
+            this._cursor += 2;
+            const a = this._dataView.getInt16(this._cursor, true);
+            this._cursor += 2;
+            return new Color(r, g, b, a/255);
+        } else if (this._colorDepth === 'Grayscale') {
+            const value = this._readBYTE();
+            const alpha = this._readBYTE();
+            return new Color(value, value, value, alpha/255);
+        } else if (this._colorDepth === 'Indexed') {
+            const index = this._readBYTE();
+            return this._indexedColors.get(index) ?? Color.Transparent;
+        }
+        return Color.Transparent;
     }
 
     private _readFixed(): number {
