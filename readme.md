@@ -1,21 +1,22 @@
 
 # Aseprite Plugin For Excalibur
 
-This extension adds support for [Aseprite](https://www.aseprite.org/) SpriteSheets and Animations exported to json.
+This extension adds support for [Aseprite](https://www.aseprite.org/) SpriteSheets and Animations exported to json or the native `.aseprite` file format.
+
+* Supports RGBA, Grayscale, and Indexed Sprites!
+* Supports opacity on cells and layers!
+* Supports tagged animations!
 
 ```
 > npm install @excaliburjs/plugin-aseprite
 ```
 
-1. Export using the [aseprite cli](https://www.aseprite.org/docs/cli/) or through the UI 
+1. Use the native `.aseprite` file format or using export json the [aseprite cli](https://www.aseprite.org/docs/cli/) or through the UI.
 
-![Export as JSON in Aseprite](./export.gif)
 
-2. Load the Aseprite resource via the json and voila ✨
+2. Load the Aseprite resource and voila ✨
   - Use `AsepriteResource.getAnimation(name)` to retrieve animations by the name in aseprite
   - Use `AsepriteResource.getSpriteSheet()` to get the equivalent Excalibur SpriteSheet
-  - Use `Aseprite.rawAseprite` to access the raw data structure from Aseprite
-  - Use `Aseprite.image` to access the source image for the SpriteSheet
 
 ## Example:
 
@@ -28,7 +29,10 @@ const game = new Engine({
     displayMode: DisplayMode.FitScreen
 });
 
-const asepriteSpriteSheet = new AsepriteResource('./beetle.json');
+// Native
+const asepriteSpriteSheet = new AsepriteResource('./beetle.aseprite');
+// Or JSON export
+// const asepriteSpriteSheet = new AsepriteResource('./beetle.json');
 
 const loader = new Loader([asepriteSpriteSheet]);
 game.start(loader).then(() => {
@@ -42,3 +46,17 @@ game.start(loader).then(() => {
 ```
 
 ![Example running](./example.gif)
+
+## Example exporting JSON in the UI
+
+![Export as JSON in Aseprite](./export.gif)
+
+## Currently unsupported in the Native format
+
+PRs welcome to address!
+
+* Layer blend modes
+* Tilesets
+* User Data
+* External files
+* Color Profiles
