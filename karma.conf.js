@@ -27,7 +27,8 @@ module.exports = function(config) {
       { pattern: './src/**/*.js.map', included: false, served: true },
       { pattern: './test/**/*.js.map', included: false, served: true },
       { pattern: './test/**/*.json', included: false, served: true },
-      { pattern: './test/**/*.png', included: false, served: true }
+      { pattern: './test/**/*.png', included: false, served: true },
+      { pattern: './test/**/*.aseprite', included: false, served: true }
     ],
 
 

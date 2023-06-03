@@ -1,5 +1,4 @@
-import { Frame, ImageSource, range, Sprite, SpriteSheet, Animation, AnimationStrategy } from "excalibur";
-import { AsepriteRawJson } from "./AsepriteRawJson";
+import { SpriteSheet, Animation } from "excalibur";
 
 
 export class AsepriteSpriteSheet {
@@ -23,7 +22,16 @@ export class AsepriteSpriteSheet {
     }
 
     clone() {
-        const spriteSheet = new AsepriteSpriteSheet(this._spriteSheet, this._animations);
+        const newAnimations = new Map<string, Animation>();
+        for (let [key, value] of this._animations.entries()) {
+            newAnimations.set(key, value.clone());
+        }
+        const newSpriteSheet = new SpriteSheet({
+            sprites: this._spriteSheet.sprites,
+            rows: this._spriteSheet.rows,
+            columns: this._spriteSheet.columns
+        });
+        const spriteSheet = new AsepriteSpriteSheet(newSpriteSheet, newAnimations);
         return spriteSheet;
     }
 }

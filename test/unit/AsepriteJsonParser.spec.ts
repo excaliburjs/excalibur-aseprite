@@ -1,9 +1,9 @@
 import { AsepriteJsonParser, AsepriteRawJson, AsepriteSpriteSheet } from "@excalibur-aseprite";
 import { AnimationStrategy, ImageSource, Sprite } from "excalibur";
 
-describe('An AsepriteSpriteSheet Parser', () => {
+describe('An AsepriteJsonParser', () => {
     it('exists', () => {
-        expect(AsepriteSpriteSheet).toBeDefined();
+        expect(AsepriteJsonParser).toBeDefined();
     });
 
     it('parses multiple aseprite animations', () => {
@@ -50,6 +50,7 @@ describe('An AsepriteSpriteSheet Parser', () => {
         }
         // TODO move to a new test
         const parser = new AsepriteJsonParser(raw, new ImageSource('./path/to/some/image'));
+        parser.parse();
         const aseprite = parser.getAsepriteSheet();
 
         const anim1 = aseprite.getAnimation('anim1');
@@ -97,14 +98,13 @@ describe('An AsepriteSpriteSheet Parser', () => {
 
 
         const parser = new AsepriteJsonParser(raw, new ImageSource('./path/to/some/image'));
+        parser.parse();
         const aseprite = parser.getAsepriteSheet();
 
         const clone = aseprite.clone();
 
         expect(clone).toBeDefined();
         expect(clone).not.toBe(aseprite);
-        // expect(aseprite.asepriteRaw).toEqual(clone.asepriteRaw);
-        // expect(aseprite.image).toEqual(clone.image);
         expect(clone.getAnimation('anim1')).not.toBe(aseprite.getAnimation('anim1'));
     })
 });

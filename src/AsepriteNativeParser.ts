@@ -17,6 +17,15 @@ export interface AnimationTag {
     repeat: number;
 }
 
+export interface LayerData {
+    name: string;
+    opacity: number;
+}
+
+/**
+ * Parses native aseprite file format
+ * Format documented from https://github.com/aseprite/aseprite/blob/main/docs/ase-file-specs.md
+ */
 export class AsepriteNativeParser {
     private _cursor = 0;
     private _colorDepth: 'RGBA' | 'Grayscale' | 'Indexed' = 'RGBA';
@@ -28,6 +37,8 @@ export class AsepriteNativeParser {
     private _tags: Map<string, AnimationTag> = new Map<string, AnimationTag>();
     private _canvasFrames: CanvasRenderingContext2D[] = [];
     private _indexedColors = new Map<number, Color>();
+    private _currentLayer = 0;
+    private _layerData = new Map<number, LayerData>();
     public height: number = 0;
     public width: number = 0;
     constructor(public arraybuffer: ArrayBuffer) {
@@ -138,6 +149,7 @@ export class AsepriteNativeParser {
         // Cel Chunk 0x2005
         if (type === 0x2005) { // 8197
             const layerIndex = this._readWORD();
+            const layerData = this._layerData.get(layerIndex);
             const xPos = this._readSHORT();
             const yPos = this._readSHORT();
             const opacity = this._readBYTE();
@@ -168,7 +180,7 @@ export class AsepriteNativeParser {
                 const imageData = new ImageData(data, width, height);
                 const imageBitmap = await createImageBitmap(imageData);
                 ctx.save();
-                ctx.globalAlpha = opacity/255;
+                ctx.globalAlpha = (opacity/255) * (layerData?.opacity ?? 255)/255;
                 ctx.drawImage(imageBitmap, xPos, yPos);
                 ctx.restore();
             // Compressed tilemap
@@ -219,11 +231,32 @@ export class AsepriteNativeParser {
                 }
             }
         }
+        // Layer chunk 0x2004
+        else if (type === 0x2004) {
+            const flags = this._readWORD()
+            const layerType = this._readWORD();
+            const layerChild = this._readWORD();
+            const defaultLayerWidth = this._readWORD(); // ignored
+            const defaultLayerHeight = this._readWORD(); // ignored
+            const blendMode = this._readWORD();
+            const opacity = this._readBYTE();
+            this._advanceBytes(3);
+            const name = this._readString();
+            if (layerType === 2) {
+                const tilesetIndex = this._readDWORD();
+            }
+            this._layerData.set(this._currentLayer++, {
+                name,
+                opacity
+            })
+        }
+
+
         // Currently unsupported chunks
 
         // Old palette chunk 0x0004
         // Old palette chunk 0x0011
-        // Layer chunk 0x2004
+        
         // Color profile 0x2007
         // Extra Cel Chunk 0x2006
         // External files 0x2008
