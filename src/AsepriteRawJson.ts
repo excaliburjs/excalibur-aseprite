@@ -1,4 +1,4 @@
-export class AsepriteRaw {
+export class AsepriteRawJson {
     frames!: {
         [key: string]: { 
             frame: { x: number, y: number, w: number, h: number },

@@ -25,9 +25,11 @@
   "devDependencies": {
     "@excaliburjs/testing": "0.25.1",
     "@types/jasmine": "3.10.8",
+    "@types/pako": "2.0.0",
     "@types/webpack-env": "1.18.1",
     "acorn": "8.8.2",
     "excalibur": "0.27.0",
+    "excalibur-jasmine": "0.2.0",
     "jasmine": "3.99.0",
     "karma": "6.4.2",
     "karma-chrome-launcher": "3.2.0",
@@ -42,5 +44,8 @@
   },
   "peerDependencies": {
     "excalibur": "0.27.0"
+  },
+  "dependencies": {
+    "pako": "2.1.0"
   }
 }
