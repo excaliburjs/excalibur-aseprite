@@ -43,7 +43,7 @@ describe('A AsepriteNativeParser', () => {
         expect(otherAnim.height).toBe(64);
 
         context.clear();
-        loopAnim.draw(context, 0, 0);
+        loopAnim.draw(context as any, 0, 0);
         context.flush();
 
         await expectAsync(canvas).toEqualImage('./test/unit/expected-rgba.png');
@@ -70,7 +70,7 @@ describe('A AsepriteNativeParser', () => {
         expect(otherAnim.height).toBe(64);
 
         context.clear();
-        loopAnim.draw(context, 0, 0);
+        loopAnim.draw(context as any, 0, 0);
         context.flush();
 
         await expectAsync(canvas).toEqualImage('./test/unit/expected-rgba-layers.png');
@@ -97,7 +97,7 @@ describe('A AsepriteNativeParser', () => {
         expect(otherAnim.height).toBe(64);
 
         context.clear();
-        loopAnim.draw(context, 0, 0);
+        loopAnim.draw(context as any, 0, 0);
         context.flush();
 
         await expectAsync(canvas).toEqualImage('./test/unit/expected-grayscale.png');
@@ -124,7 +124,7 @@ describe('A AsepriteNativeParser', () => {
         expect(otherAnim.height).toBe(64);
 
         context.clear();
-        loopAnim.draw(context, 0, 0);
+        loopAnim.draw(context as any, 0, 0);
         context.flush();
 
         await expectAsync(canvas).toEqualImage('./test/unit/expected-grayscale-layers.png');
@@ -151,7 +151,7 @@ describe('A AsepriteNativeParser', () => {
         expect(otherAnim.height).toBe(64);
 
         context.clear();
-        loopAnim.draw(context, 0, 0);
+        loopAnim.draw(context as any, 0, 0);
         context.flush();
 
         await expectAsync(canvas).toEqualImage('./test/unit/expected-rgba.png');
@@ -178,7 +178,7 @@ describe('A AsepriteNativeParser', () => {
         expect(otherAnim.height).toBe(64);
 
         context.clear();
-        loopAnim.draw(context, 0, 0);
+        loopAnim.draw(context as any, 0, 0);
         context.flush();
 
         await expectAsync(canvas).toEqualImage('./test/unit/expected-index-layers.png');
