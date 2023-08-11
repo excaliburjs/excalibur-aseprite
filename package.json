@@ -1,6 +1,6 @@
 {
   "name": "@excaliburjs/plugin-aseprite",
-  "version": "0.27.0",
+  "version": "0.28.0",
   "description": "Aseprite Resource Plugin for Excalibur",
   "main": "./dist/excalibur-aseprite.js",
   "typings": "./dist/src/index.d.ts",
@@ -28,7 +28,7 @@
     "@types/pako": "2.0.0",
     "@types/webpack-env": "1.18.1",
     "acorn": "8.10.0",
-    "excalibur": "0.27.0",
+    "excalibur": "~0.28.1",
     "excalibur-jasmine": "0.2.0",
     "jasmine": "3.99.0",
     "karma": "6.4.2",
@@ -43,7 +43,7 @@
     "webpack-dev-server": "4.15.1"
   },
   "peerDependencies": {
-    "excalibur": "0.27.0"
+    "excalibur": "~0.28.1"
   },
   "dependencies": {
     "pako": "2.1.0"
