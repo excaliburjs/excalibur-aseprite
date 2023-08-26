@@ -38,7 +38,7 @@ describe('A AsepriteNativeParser', () => {
 
         const otherAnim = nativeParser.getAnimation('Animation 2');
         expect(otherAnim.frames.length).toBe(2);
-        expect(otherAnim.strategy).toBe(AnimationStrategy.End);
+        expect(otherAnim.strategy).toBe(AnimationStrategy.Loop);
         expect(otherAnim.width).toBe(64);
         expect(otherAnim.height).toBe(64);
 
@@ -65,7 +65,7 @@ describe('A AsepriteNativeParser', () => {
 
         const otherAnim = nativeParser.getAnimation('Animation 2');
         expect(otherAnim.frames.length).toBe(2);
-        expect(otherAnim.strategy).toBe(AnimationStrategy.End);
+        expect(otherAnim.strategy).toBe(AnimationStrategy.Loop);
         expect(otherAnim.width).toBe(64);
         expect(otherAnim.height).toBe(64);
 
@@ -92,7 +92,7 @@ describe('A AsepriteNativeParser', () => {
 
         const otherAnim = nativeParser.getAnimation('Animation 2');
         expect(otherAnim.frames.length).toBe(2);
-        expect(otherAnim.strategy).toBe(AnimationStrategy.End);
+        expect(otherAnim.strategy).toBe(AnimationStrategy.Loop);
         expect(otherAnim.width).toBe(64);
         expect(otherAnim.height).toBe(64);
 
@@ -119,7 +119,7 @@ describe('A AsepriteNativeParser', () => {
 
         const otherAnim = nativeParser.getAnimation('Animation 2');
         expect(otherAnim.frames.length).toBe(2);
-        expect(otherAnim.strategy).toBe(AnimationStrategy.End);
+        expect(otherAnim.strategy).toBe(AnimationStrategy.Loop);
         expect(otherAnim.width).toBe(64);
         expect(otherAnim.height).toBe(64);
 
@@ -146,7 +146,7 @@ describe('A AsepriteNativeParser', () => {
 
         const otherAnim = nativeParser.getAnimation('Animation 2');
         expect(otherAnim.frames.length).toBe(2);
-        expect(otherAnim.strategy).toBe(AnimationStrategy.End);
+        expect(otherAnim.strategy).toBe(AnimationStrategy.Loop);
         expect(otherAnim.width).toBe(64);
         expect(otherAnim.height).toBe(64);
 
@@ -173,7 +173,7 @@ describe('A AsepriteNativeParser', () => {
 
         const otherAnim = nativeParser.getAnimation('Animation 2');
         expect(otherAnim.frames.length).toBe(2);
-        expect(otherAnim.strategy).toBe(AnimationStrategy.End);
+        expect(otherAnim.strategy).toBe(AnimationStrategy.Loop);
         expect(otherAnim.width).toBe(64);
         expect(otherAnim.height).toBe(64);
 
