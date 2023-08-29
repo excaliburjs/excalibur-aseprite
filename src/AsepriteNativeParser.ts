@@ -93,10 +93,8 @@ export class AsepriteNativeParser {
         const frames = this._exFrames.slice(animationTag.from, animationTag.to + 1);
 
         const type = animationTag.type;
-        let strategy = AnimationStrategy.End;
-        if (type === AnimationTypes.Forward) {
-            strategy = AnimationStrategy.End;
-        } else if (type === AnimationTypes.PingPong || type === AnimationTypes.PingPongReverse) {
+        let strategy = AnimationStrategy.Loop;
+        if (type === AnimationTypes.PingPong || type === AnimationTypes.PingPongReverse) {
             strategy = AnimationStrategy.PingPong;
         }
 
