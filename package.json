@@ -1,6 +1,6 @@
 {
   "name": "@excaliburjs/plugin-aseprite",
-  "version": "0.28.0",
+  "version": "0.28.1",
   "description": "Aseprite Resource Plugin for Excalibur",
   "main": "./dist/excalibur-aseprite.js",
   "typings": "./dist/src/index.d.ts",
