@@ -26,7 +26,7 @@
     "@excaliburjs/testing": "0.25.1",
     "@types/jasmine": "3.10.13",
     "@types/pako": "2.0.1",
-    "@types/webpack-env": "1.18.1",
+    "@types/webpack-env": "1.18.2",
     "acorn": "8.10.0",
     "excalibur": "~0.28.1",
     "excalibur-jasmine": "0.2.0",
