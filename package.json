@@ -27,7 +27,7 @@
     "@types/jasmine": "3.10.15",
     "@types/pako": "2.0.2",
     "@types/webpack-env": "1.18.3",
-    "acorn": "8.11.1",
+    "acorn": "8.11.2",
     "excalibur": "~0.28.1",
     "excalibur-jasmine": "0.2.0",
     "jasmine": "3.99.0",
