@@ -1,6 +1,6 @@
 {
   "name": "@excaliburjs/plugin-aseprite",
-  "version": "0.28.1",
+  "version": "0.28.7",
   "description": "Aseprite Resource Plugin for Excalibur",
   "main": "./dist/excalibur-aseprite.js",
   "typings": "./dist/src/index.d.ts",
@@ -16,8 +16,8 @@
     "type": "git",
     "url": "git+https://github.com/excaliburjs/excalibur-aseprite.git"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Erik Onarheim",
+  "license": "BSD-2-Clause",
   "bugs": {
     "url": "https://github.com/excaliburjs/excalibur-aseprite/issues"
   },
@@ -28,7 +28,7 @@
     "@types/pako": "2.0.3",
     "@types/webpack-env": "1.18.4",
     "acorn": "8.11.3",
-    "excalibur": "~0.28.1",
+    "excalibur": "~0.28.7",
     "excalibur-jasmine": "0.3.2",
     "jasmine": "3.99.0",
     "karma": "6.4.2",
