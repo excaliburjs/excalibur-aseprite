@@ -22,8 +22,8 @@ describe('An Aseprite Resource', () => {
         sut.getSpriteSheet();
 
         expect(sut.isLoaded()).toBe(false);
-        expect(logger.warn).toHaveBeenCalledWith('AspriteResource must be loaded before .getAnimation() is called');
-        expect(logger.warn).toHaveBeenCalledWith('AspriteResource must be loaded before .getSpriteSheet() is called');
+        expect(logger.warn).toHaveBeenCalledWith('AsepriteResource must be loaded before .getAnimation() is called');
+        expect(logger.warn).toHaveBeenCalledWith('AsepriteResource must be loaded before .getSpriteSheet() is called');
     });
 
     it('will return a sprite sheet and animation after loaded', async () => {
