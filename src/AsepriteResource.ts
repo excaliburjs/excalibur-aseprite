@@ -83,7 +83,7 @@ export class AsepriteResource implements Loadable<AsepriteSpriteSheet> {
         if (this.isLoaded()) {
             return this.data.getSpriteSheet();
         } else {
-            Logger.getInstance().warn('AspriteResource must be loaded before .getSpriteSheet() is called');
+            Logger.getInstance().warn('AsepriteResource must be loaded before .getSpriteSheet() is called');
         }
     }
 
@@ -95,7 +95,7 @@ export class AsepriteResource implements Loadable<AsepriteSpriteSheet> {
                 return this._nativeParser!.getAnimation(name);
             }
         } else {
-            Logger.getInstance().warn('AspriteResource must be loaded before .getAnimation() is called');
+            Logger.getInstance().warn('AsepriteResource must be loaded before .getAnimation() is called');
         }
         return null;
     }
