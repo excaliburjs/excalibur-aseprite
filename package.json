@@ -31,7 +31,7 @@
     "excalibur": "~0.29.0",
     "excalibur-jasmine": "0.3.4",
     "jasmine": "3.99.0",
-    "karma": "6.4.2",
+    "karma": "6.4.3",
     "karma-chrome-launcher": "3.2.0",
     "karma-jasmine": "4.0.2",
     "karma-webpack": "5.0.1",
