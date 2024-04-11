@@ -36,7 +36,7 @@
     "jasmine": "3.99.0",
     "karma": "6.4.3",
     "karma-chrome-launcher": "3.2.0",
-    "karma-jasmine": "4.0.2",
+    "karma-jasmine": "5.1.0",
     "karma-webpack": "5.0.1",
     "raw-loader": "4.0.2",
     "ts-loader": "9.5.1",
