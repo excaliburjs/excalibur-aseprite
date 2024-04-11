@@ -3,3 +3,7 @@ dist/
 example/*.js
 example/*.js.map
 actual*.png
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
