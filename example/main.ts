@@ -23,10 +23,14 @@ game.start(loader).then(()=>{
 
 
     const c = new Actor({pos: vec(300, 100)});
-    c.graphics.use(asepriteSpriteSheet.getAnimation()!)
+    const animAll = asepriteSpriteSheet.getAnimation()!
+    animAll.speed = .1;
+    c.graphics.use(animAll)
 
     const d = new Actor({pos: vec(400, 100)});
-    d.graphics.use(asepriteJson.getAnimation()!);
+    const animAllJson = asepriteJson.getAnimation()!
+    animAllJson.speed = .1;
+    d.graphics.use(animAllJson);
 
 
     game.currentScene.add(a);
