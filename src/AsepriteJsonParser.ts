@@ -23,15 +23,10 @@ export class AsepriteJsonParser {
             this.getAnimations())
     }
 
-    parse() {
-        const asepriteRaw = this.asepriteRaw;
+    private _parseRawToFrames(from: number, to: number, frames: AsepriteRawJson['frames']): Frame[] {
         const image = this.image;
-
-        for (let frameTag of asepriteRaw.meta.frameTags) {
-            let from = frameTag.from;
-            let to = frameTag.to;
-            let frameIndices = range(from, to);
-            let frames: Frame[] = Object.values(asepriteRaw.frames)
+        const frameIndices = range(from, to);
+        const parsed: Frame[] = Object.values(this.asepriteRaw.frames)
             .filter((_, id) => {
                 return frameIndices.includes(id);
             })
@@ -51,6 +46,21 @@ export class AsepriteJsonParser {
                     }
                 })
             }));
+        return parsed;
+    }
+
+    parse() {
+        const asepriteRaw = this.asepriteRaw;
+        const image = this.image;
+
+        this._animations.set('ex.___all', new Animation({
+            frames: this._parseRawToFrames(0, Object.entries(this.asepriteRaw.frames).length -1, this.asepriteRaw.frames),
+            strategy: AnimationStrategy.Loop
+        }));
+        for (let frameTag of asepriteRaw.meta.frameTags) {
+            let from = frameTag.from;
+            let to = frameTag.to;
+            let frames = this._parseRawToFrames(from, to, asepriteRaw.frames);
             let strategy = AnimationStrategy.Loop;
             switch(frameTag.direction) {
                 case "pingpong": {

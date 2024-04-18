@@ -55,7 +55,7 @@ export class AsepriteResource implements Loadable<AsepriteSpriteSheet> {
     public async load(): Promise<AsepriteSpriteSheet> {
         if (this._type === 'json' && this._jsonResource) {
             const asepriteData = await this._jsonResource.load();
-            const imagepath = this.convertPath(this._jsonResource.path, asepriteData.meta.image);
+            const imagepath = this.convertPath(this._jsonResource.path, asepriteData.meta.image ?? this._jsonResource.path.replace('.json', '.png'));
             const spriteSheetImage = new ImageSource(imagepath, this.bustCache);
             await spriteSheetImage.load();
 
@@ -87,7 +87,11 @@ export class AsepriteResource implements Loadable<AsepriteSpriteSheet> {
         }
     }
 
-    public getAnimation(name: string): Animation | null {
+    /**
+     * Get an animation by name, if none specified all frames are returned as an Animation.
+     * @param name
+     */
+    public getAnimation(name?: string): Animation | null {
         if (this.isLoaded()) {
             if (this._type === 'json'){
                 return this.data.getAnimation(name);

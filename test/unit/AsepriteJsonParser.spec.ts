@@ -69,6 +69,12 @@ describe('An AsepriteJsonParser', () => {
         expect(anim3.frames.length).toBe(3);
         expect(frame1OfAnim3.sourceView.x).toBe(0);
         expect(anim3.strategy).toBe(AnimationStrategy.PingPong);
+
+        const allAnim = aseprite.getAnimation();
+        const frameAllAnim = allAnim.frames[0].graphic as Sprite
+        expect(anim3.frames.length).toBe(3);
+        expect(frameAllAnim.sourceView.x).toBe(0);
+        expect(allAnim.strategy).toBe(AnimationStrategy.Loop);
     });
 
     it('can clone', () => {
