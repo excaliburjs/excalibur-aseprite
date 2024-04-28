@@ -12,7 +12,11 @@ export class AsepriteSpriteSheet {
         return this._spriteSheet
     }
 
-    getAnimation(name: string): Animation {
+    getAnimation(name?: string): Animation {
+        if (!name) {
+            return this.animations.get('ex.___all')!;
+        }
+
         if (!this.animations.has(name)) {
             throw new Error(`No animation exists with name ${name}, check your exported Aseprite file`);
         }

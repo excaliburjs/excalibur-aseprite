@@ -51,6 +51,45 @@ game.start(loader).then(() => {
 
 ![Export as JSON in Aseprite](./export.gif)
 
+## Contributing
+
+- Built with webpack 5
+- Uses webpack-dev-server
+
+To start development server:
+
+    npm start
+
+To watch:
+
+    npm run watch
+
+To compile only:
+
+    npm run build
+
+To run tests:
+
+    npx playwright install
+    npm test
+
+To update snapshots
+
+* Windows
+
+   ```powershell
+   npx playwright test --update-snapshots
+   ```
+
+* Linux for CI
+
+   ```powershell
+   docker run --rm --network host -v C:\projects\excalibur-aseprite:/work/ -w /work/ -it mcr.microsoft.com/playwright:v1.43.1-jammy /bin/bash
+   npm install
+   npx playwright test --update-snapshots
+   ```
+
+
 ## Currently unsupported in the Native format
 
 PRs welcome to address!

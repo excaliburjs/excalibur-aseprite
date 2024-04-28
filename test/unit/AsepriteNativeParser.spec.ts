@@ -49,6 +49,48 @@ describe('A AsepriteNativeParser', () => {
         await expectAsync(canvas).toEqualImage('./test/unit/expected-rgba.png');
     });
 
+    it('can parse a RGBA native file and get an animation for all', async () => {
+        // Load resource
+        const resource = new Resource<ArrayBuffer>("./test/unit/beetle-rgba-multi-animation.aseprite", "arraybuffer", true);
+        const arraybuffer = await resource.load();
+
+        const nativeParser = new AsepriteNativeParser(arraybuffer);
+        await nativeParser.parse();
+
+        const allAnim = nativeParser.getAnimation();
+        expect(allAnim.frames.length).toBe(3);
+        expect(allAnim.strategy).toBe(AnimationStrategy.Loop);
+        expect(allAnim.width).toBe(64);
+        expect(allAnim.height).toBe(64);
+
+        context.clear();
+        allAnim.draw(context as any, 0, 0);
+        context.flush();
+
+        await expectAsync(canvas).toEqualImage('./test/unit/expected-rgba.png');
+    });
+
+    it('can parse a RGBA native file with hidden layers', async () => {
+        // Load resource
+        const resource = new Resource<ArrayBuffer>("./test/unit/beetle-hidden-layer.aseprite", "arraybuffer", true);
+        const arraybuffer = await resource.load();
+
+        const nativeParser = new AsepriteNativeParser(arraybuffer);
+        await nativeParser.parse();
+
+        const allAnim = nativeParser.getAnimation();
+        expect(allAnim.frames.length).toBe(3);
+        expect(allAnim.strategy).toBe(AnimationStrategy.Loop);
+        expect(allAnim.width).toBe(64);
+        expect(allAnim.height).toBe(64);
+
+        context.clear();
+        allAnim.draw(context as any, 0, 0);
+        context.flush();
+
+        await expectAsync(canvas).toEqualImage('./test/unit/expected-hidden-layer.png');
+    });
+
     it('can parse a RGBA native file with multiple layers', async () => {
         // Load resource
         const resource = new Resource<ArrayBuffer>("./test/unit/beetle-rgba-multi-layer.aseprite", "arraybuffer", true);

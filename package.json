@@ -6,10 +6,12 @@
   "typings": "./dist/src/index.d.ts",
   "scripts": {
     "start": "webpack-dev-server --config webpack.config.test.js --open",
+    "start:ci-server": "webpack --config webpack.config.test.js && http-server ./example --port 8080",
     "watch": "webpack --progress --watch",
     "build": "webpack --mode production",
     "test:unit": "karma start",
-    "test:integration": "webpack --config webpack.config.test.js && ex-test -d ./example -t ./test/integration/test.js",
+    "test:integration": "npx playwright test",
+    "test:integration-update": "npx playwright test --update-snapshots",
     "test": "npm run test:unit && npm run test:integration"
   },
   "repository": {
@@ -23,13 +25,14 @@
   },
   "homepage": "https://github.com/excaliburjs/excalibur-aseprite#readme",
   "devDependencies": {
-    "@excaliburjs/testing": "0.25.1",
+    "@playwright/test": "1.43.1",
     "@types/jasmine": "3.10.18",
+    "@types/node": "^20.12.7",
     "@types/pako": "2.0.3",
     "@types/webpack-env": "1.18.4",
-    "acorn": "8.11.3",
     "excalibur": "~0.29.0",
     "excalibur-jasmine": "0.3.4",
+    "http-server": "14.1.1",
     "jasmine": "3.99.0",
     "karma": "6.4.3",
     "karma-chrome-launcher": "3.2.0",

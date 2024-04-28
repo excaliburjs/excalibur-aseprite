@@ -20,6 +20,7 @@ export interface AnimationTag {
 export interface LayerData {
     name: string;
     opacity: number;
+    visible: boolean;
 }
 
 /**
@@ -93,13 +94,24 @@ export class AsepriteNativeParser {
         return result;
     }
 
-    public getAnimation(name: string): Animation {
-        const animationTag = this._tags.get(name);
-        if (!animationTag) throw Error(`No animation by name [${name}] in aseprite file`);
+    /**
+     * Optionally get an animation by name
+     * @param name
+     * @returns
+     */
+    public getAnimation(name?: string): Animation {
 
-        const frames = this._exFrames.slice(animationTag.from, animationTag.to + 1);
+        let type = AnimationTypes.Forward;
+        let frames: Frame[];
+        if (name) {
+            const animationTag = this._tags.get(name);
+            if (!animationTag) throw Error(`No animation by name [${name}] in aseprite file`);
+            frames = this._exFrames.slice(animationTag.from, animationTag.to + 1);
+            type = animationTag.type;
+        } else {
+            frames = this._exFrames;
+        }
 
-        const type = animationTag.type;
         let strategy = AnimationStrategy.Loop;
         if (type === AnimationTypes.PingPong || type === AnimationTypes.PingPongReverse) {
             strategy = AnimationStrategy.PingPong;
@@ -187,7 +199,12 @@ export class AsepriteNativeParser {
                 const framePosition = this._readWORD();
                 // Copy the linked frame into this context
                 const ctx = this._canvasFramesByLayer.get(layerData!.name)![framePosition];
-                ctx.drawImage(ctx.canvas, 0, 0);
+            
+                if (layerData?.visible) {
+                    ctx.save()
+                    ctx.drawImage(ctx.canvas, 0, 0);
+                    ctx.restore();
+                }
             // Compressed image data
             } else if (cellType === 2) {
                 const width = this._readWORD();
@@ -212,16 +229,18 @@ export class AsepriteNativeParser {
                 canvasFramesByLayer.push(ctx);
                 this._canvasFramesByLayer.set(layerData!.name, canvasFramesByLayer);
 
-                ctx.save();
-                ctx.globalAlpha = (opacity/255) * (layerData?.opacity ?? 255)/255;
-                ctx.drawImage(imageBitmap, xPos, yPos);
-                ctx.restore();
+                if (layerData?.visible) {
+                    ctx.save();
+                    ctx.globalAlpha = (opacity/255) * (layerData?.opacity ?? 255)/255;
+                    ctx.drawImage(imageBitmap, xPos, yPos);
+                    ctx.restore();
+                }
 
                 return {
                     chunk: 'image',
                     layerData,
                     ctx,
-                }
+                }                
             // Compressed tilemap
             } else if (cellType === 3) {
                 // TODO tilemap support
@@ -272,7 +291,8 @@ export class AsepriteNativeParser {
         }
         // Layer chunk 0x2004
         else if (type === 0x2004) {
-            const flags = this._readWORD()
+            const flags = this._readWORD();
+            const visible = (flags & 0x1) === 1;
             const layerType = this._readWORD();
             const layerChild = this._readWORD();
             const defaultLayerWidth = this._readWORD(); // ignored
@@ -286,7 +306,8 @@ export class AsepriteNativeParser {
             }
             this._layerData.set(this._currentLayer++, {
                 name,
-                opacity
+                opacity,
+                visible
             })
         }
 
@@ -396,8 +417,8 @@ export class AsepriteNativeParser {
     private _readString(): string {
         const length = this._readWORD();
         const stringBytes = this._readBytes(length);
-        const decorder = new TextDecoder();
-        const str = decorder.decode(stringBytes);
+        const decoder = new TextDecoder();
+        const str = decoder.decode(stringBytes);
         return str;
     }
 
