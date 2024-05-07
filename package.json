@@ -29,7 +29,7 @@
     "@types/jasmine": "3.10.18",
     "@types/node": "^20.12.7",
     "@types/pako": "2.0.3",
-    "@types/webpack-env": "1.18.4",
+    "@types/webpack-env": "1.18.5",
     "excalibur": "~0.29.0",
     "excalibur-jasmine": "0.3.4",
     "http-server": "14.1.1",
