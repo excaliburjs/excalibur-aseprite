@@ -112,5 +112,60 @@ describe('An AsepriteJsonParser', () => {
         expect(clone).toBeDefined();
         expect(clone).not.toBe(aseprite);
         expect(clone.getAnimation('anim1')).not.toBe(aseprite.getAnimation('anim1'));
-    })
+    });
+
+    it('returns the same instance of animation', async () => {
+        // Load resource
+        const raw: AsepriteRawJson = {
+            meta: {
+                image: './path/to/image',
+                size: { w: 20, h: 20 },
+                scale: 1,
+                format: 'RGBA8888',
+                layers: [],
+                frameTags: [
+                    { name: "anim1", from: 0, to: 1, direction: "forward"},
+                    { name: "anim2", from: 1, to: 2, direction: "reverse"},
+                    { name: "anim3", from: 0, to: 2, direction: "pingpong"}
+                ],
+                slices: []
+            },
+            frames: {
+                "frame1": {
+                    frame: { x: 0, y: 0, w: 10, h: 10},
+                    rotated: false,
+                    trimmed: false,
+                    spriteSourceSize: { x: 0, y: 0, w: 10, h: 10 },
+                    sourceSize: { w: 10, h: 10 },
+                    duration: 500
+                },
+                "frame2": {
+                    frame: { x: 10, y: 0, w: 10, h: 10},
+                    rotated: false,
+                    trimmed: false,
+                    spriteSourceSize: { x: 0, y: 0, w: 10, h: 10 },
+                    sourceSize: { w: 10, h: 10 },
+                    duration: 500
+                },
+                "frame3": {
+                    frame: { x: 30, y: 0, w: 10, h: 10},
+                    rotated: false,
+                    trimmed: false,
+                    spriteSourceSize: { x: 0, y: 0, w: 10, h: 10 },
+                    sourceSize: { w: 10, h: 10 },
+                    duration: 500
+                }
+            }
+        }
+        // TODO move to a new test
+        const parser = new AsepriteJsonParser(raw, new ImageSource('./path/to/some/image'));
+        parser.parse();
+
+        const aseprite = parser.getAsepriteSheet();
+
+        const anim1 = aseprite.getAnimation('anim1');
+        const anim1Too = aseprite.getAnimation('anim1');
+
+        expect(anim1).toBe(anim1Too);
+    });
 });

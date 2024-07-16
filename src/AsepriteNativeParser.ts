@@ -87,12 +87,16 @@ export class AsepriteNativeParser {
         return result;
     }
 
+    private _animationCache = new Map<string, Animation>();
     /**
      * Optionally get an animation by name
      * @param name
      * @returns
      */
     public getAnimation(name?: string): Animation {
+        if (name && this._animationCache.has(name)) {
+            return this._animationCache.get(name)!;
+        }
 
         let type = AnimationTypes.Forward;
         let frames: Frame[];
@@ -120,6 +124,9 @@ export class AsepriteNativeParser {
             strategy,
             reverse
         });
+        if (name) {
+            this._animationCache.set(name, animation)
+        }
         return animation;
     }
 

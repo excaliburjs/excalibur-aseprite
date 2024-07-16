@@ -225,4 +225,17 @@ describe('A AsepriteNativeParser', () => {
 
         await expectAsync(canvas).toEqualImage('./test/unit/expected-index-layers.png');
     });
+
+    it('returns the same instance of animation', async () => {
+        // Load resource
+        const resource = new Resource<ArrayBuffer>("./test/unit/beetle-rgba-multi-animation.aseprite", "arraybuffer", true);
+        const arraybuffer = await resource.load();
+
+        const nativeParser = new AsepriteNativeParser(arraybuffer);
+        await nativeParser.parse();
+
+        const loopAnim = nativeParser.getAnimation('Loop');
+        const loopAnim2 = nativeParser.getAnimation('Loop');
+        expect(loopAnim).toBe(loopAnim2);
+    });
 });
