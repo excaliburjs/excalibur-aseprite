@@ -27,7 +27,7 @@
   "devDependencies": {
     "@playwright/test": "1.49.0",
     "@types/jasmine": "3.10.18",
-    "@types/node": "^20.12.7",
+    "@types/node": "^22.0.0",
     "@types/pako": "2.0.3",
     "@types/webpack-env": "1.18.5",
     "excalibur": "~0.29.0",
