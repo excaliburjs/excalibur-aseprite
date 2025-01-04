@@ -6,6 +6,7 @@ coverage
 example
 test
 !dist/*
+!build/**/*
 *.gif
 **/webpack.config.js
 **/webpack.config.test.js
