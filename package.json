@@ -1,14 +1,24 @@
 {
   "name": "@excaliburjs/plugin-aseprite",
-  "version": "0.30.0",
+  "version": "0.30.1",
   "description": "Aseprite Resource Plugin for Excalibur",
-  "main": "./dist/excalibur-aseprite.js",
-  "typings": "./dist/src/index.d.ts",
+  "main": "./build/umd/excalibur-aseprite.js",
+  "typings": "./build/umd/src/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./build/umd/src/index.d.ts",
+      "import": "./build/esm/excalibur-aseprite.min.js",
+      "require": "./build/umd/excalibur-aseprite.min.js"
+    }
+  },
   "scripts": {
     "start": "webpack-dev-server --config webpack.config.test.js --open",
     "start:ci-server": "webpack --config webpack.config.test.js && http-server ./example --port 8080",
     "watch": "webpack --progress --watch",
-    "build": "webpack --mode production",
+    "build:esm": "webpack --progress --config webpack.config.js --mode production --env output=esm",
+    "build:umd": "webpack --progress --config webpack.config.js --mode production",
+    "build": "npm run build:umd && npm run build:esm",
     "test:unit": "karma start",
     "test:integration": "npx playwright test",
     "test:integration-update": "npx playwright test --update-snapshots",
