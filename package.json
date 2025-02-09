@@ -43,7 +43,7 @@
     "excalibur": "~0.30.0",
     "excalibur-jasmine": "0.3.8",
     "http-server": "14.1.1",
-    "jasmine": "5.5.0",
+    "jasmine": "5.6.0",
     "karma": "6.4.4",
     "karma-chrome-launcher": "3.2.0",
     "karma-jasmine": "5.1.0",
