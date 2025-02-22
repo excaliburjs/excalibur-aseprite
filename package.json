@@ -36,7 +36,7 @@
   "homepage": "https://github.com/excaliburjs/excalibur-aseprite#readme",
   "devDependencies": {
     "@playwright/test": "1.50.1",
-    "@types/jasmine": "5.1.6",
+    "@types/jasmine": "5.1.7",
     "@types/node": "^22.10.2",
     "@types/pako": "2.0.3",
     "@types/webpack-env": "1.18.8",
