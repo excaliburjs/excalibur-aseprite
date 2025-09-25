@@ -9,7 +9,9 @@ module.exports = function(config) {
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '',
 
-    webpack,
+    webpack: {
+      ...webpack({ output: 'umd' }, { mode: 'development' }),
+    },
 
     // frameworks to use
     // available frameworks: https://www.npmjs.com/search?q=keywords:karma-adapter
@@ -17,7 +19,7 @@ module.exports = function(config) {
 
     proxies: {
       // smooths over loading files because karma prepends '/base/' to everything
-      '/test/' : '/base/test/'
+      '/test/': '/base/test/'
     },
 
     // list of files / patterns to load in the browser
@@ -27,7 +29,8 @@ module.exports = function(config) {
       { pattern: './src/**/*.js.map', included: false, served: true },
       { pattern: './test/**/*.js.map', included: false, served: true },
       { pattern: './test/**/*.json', included: false, served: true },
-      { pattern: './test/**/*.png', included: false, served: true }
+      { pattern: './test/**/*.png', included: false, served: true },
+      { pattern: './test/**/*.aseprite', included: false, served: true }
     ],
 
 

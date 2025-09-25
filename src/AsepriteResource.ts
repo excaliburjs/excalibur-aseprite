@@ -1,17 +1,41 @@
-import { ImageSource, Loadable, Logger, Resource, SpriteSheet } from 'excalibur';
-import { AsepriteRaw } from './AsepriteRaw';
+import { ImageSource, Loadable, Logger, Resource, SpriteSheet, Animation } from 'excalibur';
+import { AsepriteRawJson } from './AsepriteRawJson';
 import { AsepriteSpriteSheet } from './AsepriteSpriteSheet';
+import { AsepriteNativeParser } from './AsepriteNativeParser';
+import { AsepriteJsonParser } from './AsepriteJsonParser';
 
 
 export class AsepriteResource implements Loadable<AsepriteSpriteSheet> {
-    private _resource: Resource<AsepriteRaw>;
+    private _path: string;
+    private _type: 'native' | 'json' = 'native';
+    private _jsonResource: Resource<AsepriteRawJson> | undefined;
+    private _jsonParser: AsepriteJsonParser | undefined;
+    private _nativeResource: Resource<ArrayBuffer>| undefined;
+    private _nativeParser: AsepriteNativeParser | undefined;
     public data!: AsepriteSpriteSheet;
-    public rawAseprite!: AsepriteRaw;
-    public image!: ImageSource;
-
     public convertPath: (originPath: string, relativePath: string) => string;
+
+    private _hasFileExtension(path: string, extension: string) {
+        const fileExtension = /.*\.([A-Za-z0-9]+)(?:(?:\?|\#).*)*$/;
+        if (path) {
+            const ext = path.match(fileExtension);
+            if (ext?.length) {
+                return ext[1] === extension;
+            }
+        }
+        return false;
+    }
     constructor(path: string, public bustCache = false) {
-        this._resource = new Resource(path, 'json', bustCache);
+        this._path = path;
+        // if this is a .ase/.aseprite download as an arraybuffer 
+        if (this._hasFileExtension(path, 'ase')  || this._hasFileExtension(path, 'aseprite')) {
+            this._nativeResource = new Resource<ArrayBuffer>(path, "arraybuffer", bustCache);
+            this._type = 'native';
+        } else {
+            this._jsonResource = new Resource(path, 'json', bustCache);
+            this._type = 'json';
+        }
+
         this.convertPath = (originPath: string, relativePath: string) => {
             // Use absolute path if specified
             if (relativePath.indexOf('/') === 0) {
@@ -29,31 +53,63 @@ export class AsepriteResource implements Loadable<AsepriteSpriteSheet> {
     }
 
     public async load(): Promise<AsepriteSpriteSheet> {
-        const asepriteData = await this._resource.load();
-        const imagepath = this.convertPath(this._resource.path, asepriteData.meta.image);
-        const spriteSheetImage = new ImageSource(imagepath, this.bustCache);
-        await spriteSheetImage.load();
-        this.rawAseprite = asepriteData;
-        this.image = spriteSheetImage;
-        return this.data = new AsepriteSpriteSheet(asepriteData, spriteSheetImage);
+        if (this._type === 'json' && this._jsonResource) {
+            const asepriteData = await this._jsonResource.load();
+            const imagepath = this.convertPath(this._jsonResource.path, asepriteData.meta.image ?? this._jsonResource.path.replace('.json', '.png'));
+            const spriteSheetImage = new ImageSource(imagepath, this.bustCache);
+            await spriteSheetImage.load();
+
+            this._jsonParser = new AsepriteJsonParser(asepriteData, spriteSheetImage);
+            this._jsonParser.parse();
+
+            return this.data = this._jsonParser.getAsepriteSheet();
+        } else {
+            // type is 'native'
+            const arraybuffer = await this._nativeResource?.load();
+
+            if (arraybuffer) {
+                this._nativeParser = new AsepriteNativeParser(arraybuffer);
+    
+                await this._nativeParser.parse();
+            } else {
+                throw Error(`Could not load aseprite resource ${this._path}`);
+            }
+
+            return this.data = this._nativeParser.getAsepriteSheet();
+        }
     }
 
     public getSpriteSheet() {
         if (this.isLoaded()) {
             return this.data.getSpriteSheet();
         } else {
-            Logger.getInstance().warn('AspriteResource must be loaded before .getSpriteSheet() is called');
+            Logger.getInstance().warn('AsepriteResource must be loaded before .getSpriteSheet() is called');
         }
     }
 
-    public getAnimation(name: string) {
+    /**
+     * Get an animation by name, if none specified all frames are returned as an Animation.
+     * @param name
+     */
+    public getAnimation(name?: string): Animation | null {
         if (this.isLoaded()) {
-            return this.data.getAnimation(name);
+            if (this._type === 'json'){
+                return this.data.getAnimation(name);
+            } else {
+                return this._nativeParser!.getAnimation(name);
+            }
         } else {
-            Logger.getInstance().warn('AspriteResource must be loaded before .getAnimation() is called');
+            Logger.getInstance().warn('AsepriteResource must be loaded before .getAnimation() is called');
         }
+        return null;
     }
 
+    public clone() {
+        const clone = new AsepriteResource(this._path, this.bustCache);
+        clone.data = this.data.clone();
+
+        return clone;
+    }
 
     isLoaded(): boolean {
         return !!this.data;

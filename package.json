@@ -1,46 +1,64 @@
 {
   "name": "@excaliburjs/plugin-aseprite",
-  "version": "0.25.3",
+  "version": "0.30.2",
   "description": "Aseprite Resource Plugin for Excalibur",
-  "main": "./dist/excalibur-aseprite.js",
-  "typings": "./dist/src/index.d.ts",
+  "main": "./build/umd/excalibur-aseprite.js",
+  "typings": "./build/umd/src/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./build/umd/src/index.d.ts",
+      "import": "./build/esm/excalibur-aseprite.min.js",
+      "require": "./build/umd/excalibur-aseprite.min.js"
+    }
+  },
   "scripts": {
     "start": "webpack-dev-server --config webpack.config.test.js --open",
+    "start:ci-server": "webpack --config webpack.config.test.js && http-server ./example --port 8080",
     "watch": "webpack --progress --watch",
-    "build": "webpack --mode production",
+    "build:esm": "webpack --progress --config webpack.config.js --mode production --env output=esm",
+    "build:umd": "webpack --progress --config webpack.config.js --mode production",
+    "build": "npm run build:umd && npm run build:esm",
     "test:unit": "karma start",
-    "test:integration": "webpack --config webpack.config.test.js && ex-test -d ./example -t ./test/integration/test.js",
+    "test:integration": "npx playwright test",
+    "test:integration-update": "npx playwright test --update-snapshots",
     "test": "npm run test:unit && npm run test:integration"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/excaliburjs/excalibur-aseprite.git"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Erik Onarheim",
+  "license": "BSD-2-Clause",
   "bugs": {
     "url": "https://github.com/excaliburjs/excalibur-aseprite/issues"
   },
   "homepage": "https://github.com/excaliburjs/excalibur-aseprite#readme",
   "devDependencies": {
-    "@excaliburjs/testing": "0.25.0",
-    "@types/jasmine": "3.10.3",
-    "@types/webpack-env": "1.16.3",
-    "acorn": "8.7.0",
-    "excalibur": "0.25.3",
-    "jasmine": "3.99.0",
-    "karma": "6.3.16",
-    "karma-chrome-launcher": "3.1.0",
-    "karma-jasmine": "4.0.1",
-    "karma-webpack": "5.0.0",
+    "@playwright/test": "1.50.1",
+    "@types/jasmine": "5.1.7",
+    "@types/node": "^22.10.2",
+    "@types/pako": "2.0.3",
+    "@types/webpack-env": "1.18.8",
+    "excalibur": "~0.30.0",
+    "excalibur-jasmine": "0.3.8",
+    "http-server": "14.1.1",
+    "jasmine": "5.6.0",
+    "karma": "6.4.4",
+    "karma-chrome-launcher": "3.2.0",
+    "karma-jasmine": "5.1.0",
+    "karma-webpack": "5.0.1",
     "raw-loader": "4.0.2",
-    "ts-loader": "9.2.6",
-    "typescript": "4.5.5",
-    "webpack": "5.69.1",
-    "webpack-cli": "4.9.2",
-    "webpack-dev-server": "4.7.4"
+    "ts-loader": "9.5.2",
+    "typescript": "5.8.2",
+    "webpack": "5.98.0",
+    "webpack-cli": "5.1.4",
+    "webpack-dev-server": "5.2.0"
   },
   "peerDependencies": {
-    "excalibur": "0.25.3"
+    "excalibur": "~0.30.0"
+  },
+  "dependencies": {
+    "pako": "2.1.0"
   }
 }
