@@ -41,7 +41,7 @@
     "@types/pako": "2.0.4",
     "@types/webpack-env": "1.18.8",
     "excalibur": "~0.31.0",
-    "excalibur-jasmine": "0.3.8",
+    "excalibur-jasmine": "0.4.0",
     "http-server": "14.1.1",
     "jasmine": "5.11.0",
     "karma": "6.4.4",
