@@ -24,16 +24,12 @@
     "test:integration-update": "npx playwright test --update-snapshots",
     "test": "npm run test:unit && npm run test:integration"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/excaliburjs/excalibur-aseprite.git"
-  },
   "author": "Erik Onarheim",
   "license": "BSD-2-Clause",
   "bugs": {
-    "url": "https://github.com/excaliburjs/excalibur-aseprite/issues"
+    "url": "https://github.com/excaliburjs/plugin-aseprate/issues"
   },
-  "homepage": "https://github.com/excaliburjs/excalibur-aseprite#readme",
+  "homepage": "https://github.com/excaliburjs/plugin-aseprate#readme",
   "devDependencies": {
     "@playwright/test": "1.55.1",
     "@types/jasmine": "5.1.9",
