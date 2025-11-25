@@ -31,7 +31,7 @@
   },
   "homepage": "https://github.com/excaliburjs/plugin-aseprate#readme",
   "devDependencies": {
-    "@playwright/test": "1.56.1",
+    "@playwright/test": "1.57.0",
     "@types/jasmine": "5.1.13",
     "@types/node": "^22.10.2",
     "@types/pako": "2.0.4",
