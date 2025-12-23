@@ -54,6 +54,11 @@
   "peerDependencies": {
     "excalibur": "~0.32.0"
   },
+  "overrides": {
+    "excalibur-jasmine": {
+      "excalibur": "~0.32.0"
+    }
+  },
   "dependencies": {
     "pako": "2.1.0"
   }
