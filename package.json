@@ -4,6 +4,10 @@
   "description": "Aseprite Resource Plugin for Excalibur",
   "main": "./build/umd/excalibur-aseprite.js",
   "typings": "./build/umd/src/index.d.ts",
+  "repository": {
+      "type": "git",
+      "url": "git://github.com/excaliburjs/excalibur-aseprite.git"
+  },
   "exports": {
     "./package.json": "./package.json",
     ".": {
@@ -27,9 +31,9 @@
   "author": "Erik Onarheim",
   "license": "BSD-2-Clause",
   "bugs": {
-    "url": "https://github.com/excaliburjs/plugin-aseprate/issues"
+    "url": "https://github.com/excaliburjs/excalibur-aseprate/issues"
   },
-  "homepage": "https://github.com/excaliburjs/plugin-aseprate#readme",
+  "homepage": "https://github.com/excaliburjs/excalibur-aseprate#readme",
   "devDependencies": {
     "@playwright/test": "1.57.0",
     "@types/jasmine": "5.1.13",
