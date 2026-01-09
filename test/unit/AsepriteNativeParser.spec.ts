@@ -239,7 +239,7 @@ describe('A AsepriteNativeParser', () => {
         expect(loopAnim).toBe(loopAnim2);
     });
 
-    it('can parse an Indexed native file with multiple layers (opacity too)', async () => {
+    it('can parse an Indexed native file that uses the old palette chunk (0x0004)', async () => {
         // Load resource
         const resource = new Resource<ArrayBuffer>(
             './test/unit/beetle-indexed-no-alpha.aseprite',
