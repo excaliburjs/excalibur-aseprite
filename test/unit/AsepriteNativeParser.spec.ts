@@ -238,4 +238,28 @@ describe('A AsepriteNativeParser', () => {
         const loopAnim2 = nativeParser.getAnimation('Loop');
         expect(loopAnim).toBe(loopAnim2);
     });
+
+    it('can parse an Indexed native file that uses the old palette chunk (0x0004)', async () => {
+        // Load resource
+        const resource = new Resource<ArrayBuffer>(
+            './test/unit/beetle-indexed-no-alpha.aseprite',
+            'arraybuffer',
+            true
+        );
+        const arraybuffer = await resource.load();
+
+        const nativeParser = new AsepriteNativeParser(arraybuffer);
+        await nativeParser.parse();
+
+        const idleAnim = nativeParser.getAnimation('Loop');
+        expect(idleAnim.frames.length).toBe(1);
+        expect(idleAnim.width).toBe(64);
+        expect(idleAnim.height).toBe(64);
+
+        context.clear();
+        idleAnim.draw(context as any, 0, 0);
+        context.flush();
+
+        await expectAsync(canvas).toEqualImage('./test/unit/expected-beetle-indexed-no-alpha.png');
+    });
 });

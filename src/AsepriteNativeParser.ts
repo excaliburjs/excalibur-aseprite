@@ -40,6 +40,7 @@ export class AsepriteNativeParser {
     private _indexedColors = new Map<number, Color>();
     private _currentLayer = 0;
     private _layerData = new Map<number, LayerData>();
+    private _ignoreOldPaletteChunk = false;
     public height: number = 0;
     public width: number = 0;
     constructor(public arraybuffer: ArrayBuffer) {
@@ -237,6 +238,7 @@ export class AsepriteNativeParser {
         }
         // Palette 0x2019
         else if (type === 0x2019) {
+            this._ignoreOldPaletteChunk = true;
             const paletteSize = this._readDWORD();
             const firstIndex = this._readDWORD();
             const lastIndex = this._readDWORD();
@@ -275,11 +277,27 @@ export class AsepriteNativeParser {
                 visible
             })
         }
+        // Old Palette Chunk 0x0004
+        else if( type === 0x0004 && !this._ignoreOldPaletteChunk) {
+            
+            const numPackets = this._readWORD();
+            
+            for (let i = 0; i < numPackets; i++) {
+                const skipCount = this._readBYTE();
+                let colorCount = this._readBYTE();
 
-
+                if(colorCount === 0) {
+                    colorCount = 256;
+                }
+                for (let k = 0; k < colorCount ; k++) {
+                    const r = this._readBYTE();
+                    const g = this._readBYTE();
+                    const b = this._readBYTE();
+                    this._indexedColors.set(skipCount+k, new Color(r, g, b, 1.0));
+                }
+            }
+        }
         // Currently unsupported chunks
-
-        // Old palette chunk 0x0004
         // Old palette chunk 0x0011
         
         // Color profile 0x2007
