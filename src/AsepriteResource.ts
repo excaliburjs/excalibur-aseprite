@@ -114,4 +114,18 @@ export class AsepriteResource implements Loadable<AsepriteSpriteSheet> {
     isLoaded(): boolean {
         return !!this.data;
     }
+
+    toggleLayer(name: string, visible: boolean) {
+        if (!this.data) {
+            throw new Error('Cannot toggle layer visibility on an unloaded aseprite resource');
+        }
+
+        if (!this._nativeParser) {
+            throw new Error('Cannot toggle layer visibility on a json aseprite resource');
+        }
+
+        this._nativeParser?.getSpritesBylayer(name).forEach(sprite => {           
+            sprite.opacity = visible ? 1 : 0;            
+        })
+    }
 }
