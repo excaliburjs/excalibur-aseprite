@@ -1,4 +1,4 @@
-import { Animation, AnimationStrategy, Color, Frame, ImageSource, Sprite, SpriteSheet } from "excalibur";
+import { Animation, AnimationStrategy, Color, Frame, Graphic, GraphicsGroup, ImageSource, Sprite, SpriteSheet } from "excalibur";
 import { inflate } from 'pako';
 import { AsepriteSpriteSheet } from "./AsepriteSpriteSheet";
 
@@ -35,8 +35,9 @@ export class AsepriteNativeParser {
     private _dataView: DataView;
     private _exFrames: Frame[] = [];
     private _sprites: Sprite[] = [];
+    private _spritesByLayer: Map<string, Sprite[]> = new Map<string, Sprite[]>();
     private _tags: Map<string, AnimationTag> = new Map<string, AnimationTag>();
-    private _canvasFrames: CanvasRenderingContext2D[] = [];
+    private _canvasFramesByLayer: Map<string, CanvasRenderingContext2D[]> = new Map<string, CanvasRenderingContext2D[]>();
     private _indexedColors = new Map<number, Color>();
     private _currentLayer = 0;
     private _layerData = new Map<number, LayerData>();
@@ -52,13 +53,7 @@ export class AsepriteNativeParser {
 
         // After parsing the header we know the dimension and the number of frames
         for (let i = 0; i < this._frames; i++) {
-            const canvas = document.createElement('canvas');
-            canvas.width = this.width;
-            canvas.height = this.height;
-            const ctx = canvas.getContext('2d');
-            ctx!.imageSmoothingEnabled = false;
-            this._canvasFrames.push(ctx!);
-            await this._parseFrame(ctx!);
+            await this._parseFrame();
         }
     }
 
@@ -67,6 +62,18 @@ export class AsepriteNativeParser {
             this.getSpriteSheet(),
             this.getAnimations()
         );
+    }
+
+    public getSpritesBylayer(name: string) {    
+        return this._spritesByLayer.get(name) ?? [];
+    }
+
+    public getLayer(name: string) {        
+        for (const value of this._layerData.values()) {
+            if (value.name === name) {
+                return value;
+            }
+        }
     }
 
     public getFrames(): Frame[] {
@@ -131,7 +138,7 @@ export class AsepriteNativeParser {
         return animation;
     }
 
-    private async _parseFrame(ctx: CanvasRenderingContext2D) {
+    private async _parseFrame() {
         const frameSize = this._readDWORD();
         const magicNumber = this._readWORD();
         const oldChunks = this._readWORD();
@@ -142,24 +149,41 @@ export class AsepriteNativeParser {
 
         const numChunks = newChunks === 0 ? oldChunks : newChunks;
 
-        for (let i = 0; i < numChunks; i++) {
-            await this._parseChunk(ctx);
+        
+        let sprites: Sprite[] = []
+
+        for (let i = 0; i < numChunks; i++) {                        
+            const chunkResult = await this._parseChunk();
+
+            if (chunkResult?.chunk === 'image') {
+                // After parsing the chunks we have the image information for the frame
+                // TODO update excalibur so that we can make an ImageSource from a canvas
+                const rawImage = chunkResult.ctx.canvas.toDataURL("image/png");
+                const imageSource = new ImageSource(rawImage);
+                await imageSource.load();
+                const sprite = imageSource.toSprite()
+                sprites.push(sprite)
+
+                if (chunkResult.layerData?.name) {
+                    const sprites = this._spritesByLayer.get(chunkResult.layerData.name) ?? []
+                    sprites.push(sprite)
+                    this._spritesByLayer.set(chunkResult.layerData.name, sprites);
+                }
+            }
         }
 
-        // After parsing the chunks we have the image information for the frame
-        // TODO update excalibur so that we can make an ImageSource from a canvas
-        const rawImage = ctx.canvas.toDataURL("image/png");
-        const imageSource = new ImageSource(rawImage);
-        await imageSource.load();
-        const sprite = imageSource.toSprite();
-        this._sprites.push(sprite);
-        this._exFrames.push({
-            duration: frameDurationMs,
-            graphic: sprite
+
+        this._sprites.push(...sprites);
+
+        this._exFrames.push({            
+            graphic: new GraphicsGroup({
+                members: sprites
+            }),
+            duration: frameDurationMs
         })
     }
 
-    private async _parseChunk(ctx: CanvasRenderingContext2D) {
+    private async _parseChunk() {
         const startCursor = this._cursor;
         const size = this._readDWORD();
         const type = this._readWORD();
@@ -182,10 +206,11 @@ export class AsepriteNativeParser {
             } else if (cellType === 1) {
                 const framePosition = this._readWORD();
                 // Copy the linked frame into this context
-                const linkedFrame = this._canvasFrames[framePosition];
+                const ctx = this._canvasFramesByLayer.get(layerData!.name)![framePosition];
+            
                 if (layerData?.visible) {
                     ctx.save()
-                    ctx.drawImage(linkedFrame.canvas, 0, 0);
+                    ctx.drawImage(ctx.canvas, 0, 0);
                     ctx.restore();
                 }
             // Compressed image data
@@ -198,15 +223,32 @@ export class AsepriteNativeParser {
                 const compressed = this._readBytes(sizeToRead);
                 const decompressed = inflate(compressed);
                 const transformed = this._transformImageDataToRGBA(decompressed);
+                    
                 const data = new Uint8ClampedArray(transformed);
                 const imageData = new ImageData(data, width, height);
                 const imageBitmap = await createImageBitmap(imageData);
+                const canvas = document.createElement('canvas');
+                canvas.width = this.width;
+                canvas.height = this.height;
+                const ctx = canvas.getContext('2d')!;
+                ctx.imageSmoothingEnabled = false;
+
+                const canvasFramesByLayer = this._canvasFramesByLayer.get(layerData!.name) ?? [];
+                canvasFramesByLayer.push(ctx);
+                this._canvasFramesByLayer.set(layerData!.name, canvasFramesByLayer);
+
                 if (layerData?.visible) {
                     ctx.save();
                     ctx.globalAlpha = (opacity/255) * (layerData?.opacity ?? 255)/255;
                     ctx.drawImage(imageBitmap, xPos, yPos);
                     ctx.restore();
                 }
+
+                return {
+                    chunk: 'image',
+                    layerData,
+                    ctx,
+                }                
             // Compressed tilemap
             } else if (cellType === 3) {
                 // TODO tilemap support
