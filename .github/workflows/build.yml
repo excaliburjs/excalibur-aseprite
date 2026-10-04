@@ -32,6 +32,8 @@ jobs:
           ${{ runner.os }}-node-
     - run: npm ci
     - run: npm run build
+    - name: Install Playwright Chromium
+      run: npx playwright install --with-deps chromium
     - run: npm run test:unit
 
   # The golden masters in test/e2e/*-snapshots are recorded as `-chromium-linux`, under
