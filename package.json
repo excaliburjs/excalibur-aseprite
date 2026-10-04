@@ -1,32 +1,31 @@
 {
   "name": "@excaliburjs/plugin-aseprite",
-  "version": "0.32.1",
+  "version": "1.0.0-alpha.0",
   "description": "Aseprite Resource Plugin for Excalibur",
-  "main": "./build/umd/excalibur-aseprite.js",
-  "typings": "./build/umd/src/index.d.ts",
+  "main": "./build/esm/excalibur-aseprite.js",
+  "typings": "./build/esm/src/index.d.ts",
   "repository": {
-      "type": "git",
-      "url": "git://github.com/excaliburjs/excalibur-aseprite.git"
+    "type": "git",
+    "url": "git://github.com/excaliburjs/excalibur-aseprite.git"
   },
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "types": "./build/umd/src/index.d.ts",
-      "import": "./build/esm/excalibur-aseprite.min.js",
-      "require": "./build/umd/excalibur-aseprite.min.js"
+      "types": "./build/esm/src/index.d.ts",
+      "import": "./build/esm/excalibur-aseprite.min.js"
     }
   },
   "scripts": {
-    "start": "webpack-dev-server --config webpack.config.test.js --open",
-    "start:ci-server": "webpack --config webpack.config.test.js && http-server ./example --port 8080",
+    "start": "vite example",
     "watch": "webpack --progress --watch",
-    "build:esm": "webpack --progress --config webpack.config.js --mode production --env output=esm",
-    "build:umd": "webpack --progress --config webpack.config.js --mode production",
-    "build": "npm run build:umd && npm run build:esm",
-    "test:unit": "karma start",
-    "test:integration": "npx playwright test",
-    "test:integration-update": "npx playwright test --update-snapshots",
-    "test": "npm run test:unit && npm run test:integration"
+    "types": "tsc --project tsconfig.json --declaration --emitDeclarationOnly",
+    "type-check": "tsc --noEmit",
+    "build:esm": "vite build && vite build --minify false",
+    "build": "npm run build:esm && npm run types",
+    "test:unit": "vitest --project unit",
+    "test:e2e": "playwright test",
+    "test:e2e:update": "playwright test --update-snapshots",
+    "test": "npm run test:unit && npm run test:e2e"
   },
   "author": "Erik Onarheim",
   "license": "BSD-2-Clause",
@@ -39,9 +38,9 @@
     "@types/jasmine": "5.1.15",
     "@types/node": "24.13.3",
     "@types/webpack-env": "1.18.8",
-    "excalibur": "~0.32.0",
+    "@vitest/browser-playwright": "5.0.3",
+    "excalibur": "0.33.0-alpha.277",
     "excalibur-jasmine": "0.5.0",
-    "http-server": "14.1.1",
     "jasmine": "5.13.0",
     "karma": "6.4.4",
     "karma-chrome-launcher": "3.2.0",
@@ -50,16 +49,19 @@
     "raw-loader": "4.0.2",
     "ts-loader": "9.6.2",
     "typescript": "5.9.3",
+    "vite": "8.1.4",
+    "vite-plugin-node-polyfills": "0.28.0",
+    "vitest": "5.0.3",
     "webpack": "5.107.2",
     "webpack-cli": "6.0.1",
     "webpack-dev-server": "6.0.0"
   },
   "peerDependencies": {
-    "excalibur": "~0.32.0"
+    "excalibur": ">=0.33.0-alpha.224"
   },
   "overrides": {
     "excalibur-jasmine": {
-      "excalibur": "~0.32.0"
+      "excalibur": "0.33.0-alpha.224"
     }
   },
   "dependencies": {
