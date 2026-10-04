@@ -21,7 +21,7 @@ export default defineConfig(
     test: {
       name: 'unit',
       globals: true,
-      setupFiles: ['./__matchers__/expect.ts', './__matchers__/expect.visual.ts'],
+      setupFiles: ['./__matchers__/expect.visual.ts'],
       include: ['./**/*spec.ts'],
       // this will give each test their own environment. disabling this
       // actually ended up breaking WebGL contexts in some cases

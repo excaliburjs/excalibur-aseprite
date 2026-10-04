@@ -1,8 +1,5 @@
 // port of excalibur-jasmine for jest. might be a good idea to publish this as its own package.
-import type { ExcaliburVisual } from './image-helpers';
-import { convertSourceVisualToImageData, compareImageData } from './image-helpers';
-
-import type * as ex from '@excalibur';
+import type * as ex from 'excalibur';
 import { expect } from 'vitest';
 
 expect.extend({
@@ -27,55 +24,4 @@ expect.extend({
       };
     }
   },
-  toHaveValues: (actual: ex.Actor, expected: ex.ActorArgs) => {
-    let message = 'Expected actor to have properties:\r\n\r\n';
-    let passed = true;
-    for (const key in expected) {
-      if (actual[key] !== expected[key]) {
-        passed = false;
-        message += `Expected actor.${key} to be ${expected[key]}, but got ${actual[key]}\r\n`;
-      }
-    }
-
-    return {
-      pass: passed,
-      message: () => (passed ? 'Actor properties match' : message)
-    };
-  },
-  toHaveLoadedImages: async (actual: HTMLCanvasElement, images: ExcaliburVisual[], tolerance: number = 0.995) => {
-    const results: Promise<ImageData>[] = [];
-    for (const image of images) {
-      results.push(convertSourceVisualToImageData(image));
-    }
-
-    const data = await Promise.all(results);
-
-    let pass = true;
-    let msg: string | undefined;
-
-    for (const imgData of data) {
-      const result = await compareImageData(actual, imgData, tolerance);
-      if (!result.pass) {
-        pass = false;
-        msg = result.message();
-        break;
-      }
-    }
-
-    return {
-      pass,
-      message: () => msg
-    };
-  }
 });
-
-interface CustomMatchers<R = unknown> {
-  toBeVector(expected: ex.Vector, delta?: number): R;
-  toHaveValues(expected: ex.ActorArgs): R;
-  toHaveLoadedImages(images: ExcaliburVisual[], tolerance?: number): Promise<R>;
-}
-
-declare module 'vitest' {
-  interface Assertion<T = any> extends CustomMatchers<T> {}
-  interface AsymmetricMatchersContaining extends CustomMatchers {}
-}

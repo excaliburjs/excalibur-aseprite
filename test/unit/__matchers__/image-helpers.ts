@@ -15,6 +15,8 @@ export const convertSourceVisualToImageData = async (visual: ImageVisual): Promi
   if (typeof visual === 'string') {
     return await convertFilePath(visual);
   }
+
+  throw new Error("Invalid visual source data");
 };
 
 export const flushSourceToImageData = async (source: Visual) => {
@@ -133,7 +135,7 @@ const convertContext = (visual: CanvasRenderingContext2D): ImageData => {
 
 const convertCanvas = (canvas: HTMLCanvasElement): ImageData => {
   const ctx = canvas.getContext('2d');
-  const data = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const data = ctx!.getImageData(0, 0, canvas.width, canvas.height);
   return data;
 };
 
@@ -155,8 +157,8 @@ const convertFilePath = async (imagePath: string, baseImagePath: string = ''): P
   canvas.width = img.width;
   canvas.height = img.height;
 
-  ctx.drawImage(img, 0, 0);
-  return ctx.getImageData(0, 0, img.width, img.height);
+  ctx!.drawImage(img, 0, 0);
+  return ctx!.getImageData(0, 0, img.width, img.height);
 };
 
 const convertImage = async (image: HTMLImageElement): Promise<ImageData> => {
@@ -174,9 +176,9 @@ const convertImage = async (image: HTMLImageElement): Promise<ImageData> => {
   canvas.width = image.width;
   canvas.height = image.height;
   const ctx = canvas.getContext('2d');
-  ctx.drawImage(image, 0, 0);
+  ctx!.drawImage(image, 0, 0);
 
-  return ctx.getImageData(0, 0, image.width, image.height);
+  return ctx!.getImageData(0, 0, image.width, image.height);
 };
 
 export type { ImageVisual };

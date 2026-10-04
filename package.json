@@ -39,7 +39,8 @@
     "@types/node": "24.13.3",
     "@vitest/browser-playwright": "5.0.3",
     "excalibur": "0.33.0-alpha.247",
-    "typescript": "5.9.3",
+    "pixelmatch": "7.2.0",
+    "typescript": "7.0.2",
     "vite": "8.1.4",
     "vite-plugin-node-polyfills": "0.28.0",
     "vitest": "5.0.3"
