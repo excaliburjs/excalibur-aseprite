@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    uses: ./.github/workflows/playwright.yml
+    uses: ./.github/workflows/build.yml
   deploy_release:
     name: Publish npm package
     needs: [build]
