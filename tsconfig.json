@@ -6,6 +6,10 @@
     "files.d.ts"
   ],
   "compilerOptions": {
+    "types": [
+      "@vitest/browser-playwright",
+      "vitest/globals"
+    ],
     "paths": {
       "@excalibur-aseprite": [
         "./src/"

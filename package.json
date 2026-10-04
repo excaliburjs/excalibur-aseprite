@@ -17,7 +17,7 @@
   },
   "scripts": {
     "start": "vite example",
-    "watch": "webpack --progress --watch",
+    "watch": "vite dev",
     "types": "tsc --project tsconfig.json --declaration --emitDeclarationOnly",
     "type-check": "tsc --noEmit",
     "build:esm": "vite build && vite build --minify false",
@@ -37,32 +37,15 @@
     "@playwright/test": "1.63.0",
     "@types/jasmine": "5.1.15",
     "@types/node": "24.13.3",
-    "@types/webpack-env": "1.18.8",
     "@vitest/browser-playwright": "5.0.3",
-    "excalibur": "0.33.0-alpha.277",
-    "excalibur-jasmine": "0.5.0",
-    "jasmine": "5.13.0",
-    "karma": "6.4.4",
-    "karma-chrome-launcher": "3.2.0",
-    "karma-jasmine": "5.1.0",
-    "karma-webpack": "5.0.1",
-    "raw-loader": "4.0.2",
-    "ts-loader": "9.6.2",
+    "excalibur": "0.33.0-alpha.247",
     "typescript": "5.9.3",
     "vite": "8.1.4",
     "vite-plugin-node-polyfills": "0.28.0",
-    "vitest": "5.0.3",
-    "webpack": "5.107.2",
-    "webpack-cli": "6.0.1",
-    "webpack-dev-server": "6.0.0"
+    "vitest": "5.0.3"
   },
   "peerDependencies": {
-    "excalibur": ">=0.33.0-alpha.224"
-  },
-  "overrides": {
-    "excalibur-jasmine": {
-      "excalibur": "0.33.0-alpha.224"
-    }
+    "excalibur": ">=0.33.0-alpha.247"
   },
   "dependencies": {
     "pako": "3.0.1"

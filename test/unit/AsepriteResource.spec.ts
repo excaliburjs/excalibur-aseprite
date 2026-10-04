@@ -16,8 +16,8 @@ describe('An Aseprite Resource', () => {
     it('will log a warning if not yet loaded', () => {
         const sut = new AsepriteResource('test/unit/beetle.json');
         const logger = Logger.getInstance();
-        spyOn(logger, 'warn');
-        
+        vi.spyOn(logger, 'warn');
+
         sut.getAnimation('Loop');
         sut.getSpriteSheet();
 
