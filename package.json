@@ -35,7 +35,7 @@
   "homepage": "https://github.com/excaliburjs/excalibur-aseprate#readme",
   "devDependencies": {
     "@playwright/test": "1.64.0",
-    "@types/node": "24.19.1",
+    "@types/node": "24.19.2",
     "@vitest/browser-playwright": "5.0.3",
     "excalibur": "0.33.0-alpha.247",
     "pixelmatch": "7.2.0",
