@@ -36,13 +36,13 @@
   "devDependencies": {
     "@playwright/test": "1.64.1",
     "@types/node": "24.19.2",
-    "@vitest/browser-playwright": "5.0.4",
+    "@vitest/browser-playwright": "5.0.5",
     "excalibur": "0.33.0-alpha.247",
     "pixelmatch": "7.2.0",
     "typescript": "7.0.2",
     "vite": "8.3.4",
     "vite-plugin-node-polyfills": "0.28.0",
-    "vitest": "5.0.4"
+    "vitest": "5.0.5"
   },
   "peerDependencies": {
     "excalibur": ">=0.33.0-alpha.247"
