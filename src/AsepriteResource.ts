@@ -80,7 +80,7 @@ export class AsepriteResource implements Loadable<AsepriteSpriteSheet> {
     }
 
     public getSpriteSheet() {
-        if (this.isLoaded()) {
+        if (this.isLoaded) {
             return this.data.getSpriteSheet();
         } else {
             Logger.getInstance().warn('AsepriteResource must be loaded before .getSpriteSheet() is called');
@@ -92,7 +92,7 @@ export class AsepriteResource implements Loadable<AsepriteSpriteSheet> {
      * @param name
      */
     public getAnimation(name?: string): Animation | null {
-        if (this.isLoaded()) {
+        if (this.isLoaded) {
             if (this._type === 'json'){
                 return this.data.getAnimation(name);
             } else {
@@ -111,7 +111,7 @@ export class AsepriteResource implements Loadable<AsepriteSpriteSheet> {
         return clone;
     }
 
-    isLoaded(): boolean {
+    get isLoaded(): boolean {
         return !!this.data;
     }
 }

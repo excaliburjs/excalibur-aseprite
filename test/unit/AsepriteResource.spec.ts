@@ -10,7 +10,7 @@ describe('An Aseprite Resource', () => {
         const sut = new AsepriteResource('test/unit/beetle.json');
         await sut.load();
 
-        expect(sut.isLoaded());
+        expect(sut.isLoaded);
     });
 
     it('will log a warning if not yet loaded', () => {
@@ -21,7 +21,7 @@ describe('An Aseprite Resource', () => {
         sut.getAnimation('Loop');
         sut.getSpriteSheet();
 
-        expect(sut.isLoaded()).toBe(false);
+        expect(sut.isLoaded).toBe(false);
         expect(logger.warn).toHaveBeenCalledWith('AsepriteResource must be loaded before .getAnimation() is called');
         expect(logger.warn).toHaveBeenCalledWith('AsepriteResource must be loaded before .getSpriteSheet() is called');
     });
@@ -53,7 +53,7 @@ describe('An Aseprite Resource', () => {
 
         expect(sut).not.toBe(clone);
         expect(clone).toBeDefined();
-        expect(clone.isLoaded()).toBe(true);
+        expect(clone.isLoaded).toBe(true);
         expect(clone.data).toBeDefined();
     })
 });
